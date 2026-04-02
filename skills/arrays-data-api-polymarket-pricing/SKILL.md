@@ -25,6 +25,19 @@ To obtain token IDs: query `GET /markets` on the Gamma API (via `arrays-data-api
 
 The `/prices-history` endpoint uses a **token ID** as its `market` parameter (not a conditionId).
 
+## Price types across Polymarket APIs
+
+Polymarket surfaces prices through multiple APIs with different meanings and latency:
+
+| Price source | API | Meaning | Latency | Matches website? |
+|-------------|-----|---------|---------|-----------------|
+| `outcomePrices` | Gamma `/markets`, `/events` | Cached midpoint snapshot | Minutes (delayed) | ~0.1–0.5% lower |
+| `/midpoint` | CLOB | Real-time (Best Bid + Best Ask) / 2 | Real-time | ~half a spread lower |
+| `/price?side=buy` | CLOB | Real-time Ask (cost to buy) | Real-time | **= website displayed price** |
+| `/price?side=sell` | CLOB | Real-time Bid (proceeds from selling) | Real-time | One spread lower |
+
+**Guidance**: When the user asks for "current price" or "odds", use `/price?side=buy` to match what they see on the Polymarket website. Use `/midpoint` for unbiased mid-market estimates. The Gamma `outcomePrices` field is convenient for bulk screening but may be stale.
+
 ## Endpoints
 
 | Method | Path | Description |
@@ -117,8 +130,8 @@ Bids are sorted by price descending (best bid first). Asks are sorted by price a
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
 | `market` | string | **yes** | CLOB **token ID** (not conditionId) |
-| `interval` | string | no | Time range: `1d`, `1w`, `1m`, `3m`, `6m`, `1y`, `max` |
-| `fidelity` | int | no | Number of data points to return (e.g. `60`, `100`) |
+| `interval` | string | no | Time range: `1h`, `6h`, `1d`, `1w`, `1m`. Only these five values are accepted; others (e.g. `3m`, `6m`, `1y`, `max`) return 400 errors. |
+| `fidelity` | int | no | Sampling granularity hint. Omit to get full-resolution data. Avoid small values (e.g. < 10) as the API may return an empty `history` array silently. |
 
 **Response** — JSON object:
 
@@ -132,6 +145,8 @@ Each data point:
 |-------|------|-------------|
 | `t` | number | Unix timestamp (seconds) |
 | `p` | number | Price at that time |
+
+**Rate-limit note**: Rapid consecutive `/prices-history` requests may return HTTP 200 with an empty `history` array (silent failure, no error code). Space requests at least 1 second apart to avoid this.
 
 ### Server time (`/time`)
 
@@ -197,11 +212,12 @@ print(f"Top 3 asks:")
 for a in book["asks"][:3]:
     print(f"  {a['price']} x {a['size']}")
 
-# 6. Get price history (last 1 week, 60 data points)
+# 6. Get price history (last 1 week)
+# Supported intervals: 1h, 6h, 1d, 1w, 1m
+# Omit fidelity for full resolution; avoid small fidelity values
 resp = requests.get(f"{CLOB}/prices-history", params={
     "market": token_ids[0],
-    "interval": "1w",
-    "fidelity": 60
+    "interval": "1w"
 })
 history = resp.json()["history"]
 print(f"Price history ({len(history)} points):")

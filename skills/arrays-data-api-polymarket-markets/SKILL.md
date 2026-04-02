@@ -67,7 +67,7 @@ To get prices for a market, extract `clobTokenIds` from the Gamma `/markets` res
 |-------|------|----------|-------------|
 | `limit` | int | no | Results per page |
 | `offset` | int | no | Pagination offset |
-| `order` | string | no | Sort field (e.g. `volume_num`, `liquidity_num`, `created_at`) |
+| `order` | string | no | Sort field. Supported values: `volume`, `volume24hr`, `volume1wk`, `volume1mo`, `volume1yr`, `liquidity`, `competitive`, `created_at`. Note: `comment_count` is NOT supported (returns 422). |
 | `ascending` | bool | no | Sort direction |
 | `id` | string | no | Filter by market ID |
 | `slug` | string | no | Filter by slug |
@@ -98,7 +98,7 @@ To get prices for a market, extract `clobTokenIds` from the Gamma `/markets` res
 | `slug` | string | URL slug |
 | `description` | string | Full market description |
 | `outcomes` | string | JSON-encoded array of outcome names, e.g. `"[\"Yes\", \"No\"]"` |
-| `outcomePrices` | string | JSON-encoded array of prices, e.g. `"[\"0.2165\", \"0.7835\"]"` |
+| `outcomePrices` | string | JSON-encoded array of prices, e.g. `"[\"0.2165\", \"0.7835\"]"`. **Note**: This is a Gamma server cached midpoint snapshot with minutes of delay. For real-time prices, use the pricing skill's CLOB `/price` or `/midpoint` endpoints. |
 | `clobTokenIds` | string | JSON-encoded array of CLOB token IDs per outcome |
 | `active` | bool | Whether market is active |
 | `closed` | bool | Whether market is closed |
@@ -259,6 +259,20 @@ No request parameters.
 | `series` | string | Associated series ID |
 | `createdAt` | string | Creation timestamp (ISO 8601) |
 
+### Slug patterns for multi-event markets
+
+**Sports sub-markets**: A single sports match is split into multiple events in the API, distinguished by slug suffixes. For example, a match with base slug `uel-rom1-bol1-2026-03-19` has:
+- `uel-rom1-bol1-2026-03-19` — match result (win/draw/lose)
+- `uel-rom1-bol1-2026-03-19-more-markets` — spreads, totals
+- `uel-rom1-bol1-2026-03-19-player-props` — player props
+- `uel-rom1-bol1-2026-03-19-exact-score` — exact score
+- `uel-rom1-bol1-2026-03-19-halftime-result` — halftime result
+- `uel-rom1-bol1-2026-03-19-total-corners` — total corners
+
+To get all sub-markets for a match, query `/events?slug=` for each suffix variant.
+
+**Short-cycle crypto markets**: BTC/ETH/SOL/DOGE/XRP 5-minute markets follow a deterministic slug pattern: `btc-updown-5m-{unix_timestamp}` where timestamps increment by 300 seconds per slot. To enumerate all slots in a time range, construct slugs directly and query `/events?slug=` for each — do NOT rely on `/public-search` which may miss slots.
+
 ### Public search (`/public-search`)
 
 **Request parameters**
@@ -278,6 +292,9 @@ No request parameters.
 | Field | Type | Description |
 |-------|------|-------------|
 | `events` | array | Array of matching event objects (same shape as `/events`) |
+| `pagination` | object | Contains `hasMore` (bool) and `totalResults` (int) |
+
+**Pagination behavior**: Default returns 5 results per type. `limit_per_type` max is 50 per page. Use `page` parameter (1-indexed) to paginate when `pagination.hasMore` is true.
 
 ### Positions (`/positions`)
 
@@ -489,6 +506,8 @@ Always check the HTTP status code. A `200` indicates success.
 ## Pagination
 
 All list endpoints support **offset-based pagination** with `limit` and `offset` parameters. There is no cursor-based pagination or `has_more` field — if the returned array length equals `limit`, there may be more results.
+
+**Important**: Polymarket has tens of thousands of active markets. For screener-type queries (e.g. filtering all markets by odds or expiry), you MUST paginate through all pages until the returned array is shorter than `limit`. Stopping after the first page can miss the vast majority of matching results. Use server-side filters (`volume_num_min`, `liquidity_num_max`, `end_date_min/max`, `tag_id`) to reduce the dataset before client-side filtering on fields like `outcomePrices`.
 
 ## Python examples
 
