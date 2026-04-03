@@ -25,19 +25,6 @@ To obtain token IDs: query `GET /markets` on the Gamma API (via `arrays-data-api
 
 The `/prices-history` endpoint uses a **token ID** as its `market` parameter (not a conditionId).
 
-## Price types across Polymarket APIs
-
-Polymarket surfaces prices through multiple APIs with different meanings and latency:
-
-| Price source | API | Meaning | Latency | Matches website? |
-|-------------|-----|---------|---------|-----------------|
-| `outcomePrices` | Gamma `/markets`, `/events` | Cached midpoint snapshot | Minutes (delayed) | ~0.1–0.5% lower |
-| `/midpoint` | CLOB | Real-time (Best Bid + Best Ask) / 2 | Real-time | ~half a spread lower |
-| `/price?side=buy` | CLOB | Real-time Ask (cost to buy) | Real-time | **= website displayed price** |
-| `/price?side=sell` | CLOB | Real-time Bid (proceeds from selling) | Real-time | One spread lower |
-
-**Guidance**: When the user asks for "current price" or "odds", use `/price?side=buy` to match what they see on the Polymarket website. Use `/midpoint` for unbiased mid-market estimates. The Gamma `outcomePrices` field is convenient for bulk screening but may be stale.
-
 ## Endpoints
 
 | Method | Path | Description |
@@ -80,6 +67,17 @@ Polymarket surfaces prices through multiple APIs with different meanings and lat
 | Field | Type | Description |
 |-------|------|-------------|
 | `mid` | string | Mid-market price (decimal string, e.g. `"0.218"`) |
+
+### Price types across Polymarket APIs
+
+| Price source | API | Meaning | Latency | Matches website? |
+|-------------|-----|---------|---------|-----------------|
+| `outcomePrices` | Gamma `/markets`, `/events` | Cached midpoint snapshot | Minutes (delayed) | ~0.1–0.5% lower |
+| `/midpoint` | CLOB | Real-time (Best Bid + Best Ask) / 2 | Real-time | ~half a spread lower |
+| `/price?side=buy` | CLOB | Real-time Ask (cost to buy) | Real-time | **= website displayed price** |
+| `/price?side=sell` | CLOB | Real-time Bid (proceeds from selling) | Real-time | One spread lower |
+
+**Guidance**: When the user asks for "current price" or "odds", use `/price?side=buy` to match what they see on the Polymarket website. Use `/midpoint` for unbiased mid-market estimates. The Gamma `outcomePrices` field is convenient for bulk screening but may be stale.
 
 ### Order book (`/book`)
 
@@ -131,7 +129,7 @@ Bids are sorted by price descending (best bid first). Asks are sorted by price a
 |-------|------|----------|-------------|
 | `market` | string | **yes** | CLOB **token ID** (not conditionId) |
 | `interval` | string | no | Time range: `1h`, `6h`, `1d`, `1w`, `1m`. Only these five values are accepted; others (e.g. `3m`, `6m`, `1y`, `max`) return 400 errors. |
-| `fidelity` | int | no | Sampling granularity hint. Omit to get full-resolution data. Avoid small values (e.g. < 10) as the API may return an empty `history` array silently. |
+| `fidelity` | int | no | Sampling interval in minutes (e.g. fidelity=5 means one data point every 5 minutes, fidelity=60 means one per hour). Omit for full-resolution data. Avoid very small values as the API may return an empty `history` array silently. |
 
 **Response** — JSON object:
 

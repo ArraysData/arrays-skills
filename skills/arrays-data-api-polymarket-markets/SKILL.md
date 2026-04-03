@@ -67,7 +67,7 @@ To get prices for a market, extract `clobTokenIds` from the Gamma `/markets` res
 |-------|------|----------|-------------|
 | `limit` | int | no | Results per page |
 | `offset` | int | no | Pagination offset |
-| `order` | string | no | Sort field. Supported values: `volume`, `volume24hr`, `volume1wk`, `volume1mo`, `volume1yr`, `liquidity`, `competitive`, `created_at`. Note: `comment_count` is NOT supported (returns 422). |
+| `order` | string | no | Sort field. Supported values: `volume`, `volume24hr`, `volume1wk`, `volume1mo`, `volume1yr`, `liquidity`, `competitive`, `created_at`. `competitive` sorts by `abs(price - 0.5)` ascending (closest to 50/50 first) — it is a sort order only, not a filter. There are no `odds_min`/`odds_max` filter params; use `competitive` sort + client-side filtering instead. Note: `comment_count` is NOT supported (returns 422). |
 | `ascending` | bool | no | Sort direction |
 | `id` | string | no | Filter by market ID |
 | `slug` | string | no | Filter by slug |
@@ -258,20 +258,6 @@ No request parameters.
 | `tags` | string | Comma-separated tag IDs |
 | `series` | string | Associated series ID |
 | `createdAt` | string | Creation timestamp (ISO 8601) |
-
-### Slug patterns for multi-event markets
-
-**Sports sub-markets**: A single sports match is split into multiple events in the API, distinguished by slug suffixes. For example, a match with base slug `uel-rom1-bol1-2026-03-19` has:
-- `uel-rom1-bol1-2026-03-19` — match result (win/draw/lose)
-- `uel-rom1-bol1-2026-03-19-more-markets` — spreads, totals
-- `uel-rom1-bol1-2026-03-19-player-props` — player props
-- `uel-rom1-bol1-2026-03-19-exact-score` — exact score
-- `uel-rom1-bol1-2026-03-19-halftime-result` — halftime result
-- `uel-rom1-bol1-2026-03-19-total-corners` — total corners
-
-To get all sub-markets for a match, query `/events?slug=` for each suffix variant.
-
-**Short-cycle crypto markets**: BTC/ETH/SOL/DOGE/XRP 5-minute markets follow a deterministic slug pattern: `btc-updown-5m-{unix_timestamp}` where timestamps increment by 300 seconds per slot. To enumerate all slots in a time range, construct slugs directly and query `/events?slug=` for each — do NOT rely on `/public-search` which may miss slots.
 
 ### Public search (`/public-search`)
 
