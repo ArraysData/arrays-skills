@@ -292,9 +292,7 @@ To get all sub-markets for a match, query `/events?slug=` for each suffix varian
 | Field | Type | Description |
 |-------|------|-------------|
 | `events` | array | Array of matching event objects (same shape as `/events`) |
-| `pagination` | object | Contains `hasMore` (bool) and `totalResults` (int) |
-
-**Pagination behavior**: Default returns 5 results per type. `limit_per_type` max is 50 per page. Use `page` parameter (1-indexed) to paginate when `pagination.hasMore` is true.
+| `pagination` | object | Contains `hasMore` (bool) and `totalResults` (int). See Pagination section for details. |
 
 ### Positions (`/positions`)
 
@@ -505,9 +503,27 @@ Always check the HTTP status code. A `200` indicates success.
 
 ## Pagination
 
-All list endpoints support **offset-based pagination** with `limit` and `offset` parameters. There is no cursor-based pagination or `has_more` field — if the returned array length equals `limit`, there may be more results.
+Most list endpoints use **offset-based pagination** (`limit` + `offset`). The exception is `/public-search` which uses **page-based pagination** (`limit_per_type` + `page`).
 
-**Important**: Polymarket has tens of thousands of active markets. For screener-type queries (e.g. filtering all markets by odds or expiry), you MUST paginate through all pages until the returned array is shorter than `limit`. Stopping after the first page can miss the vast majority of matching results. Use server-side filters (`volume_num_min`, `liquidity_num_max`, `end_date_min/max`, `tag_id`) to reduce the dataset before client-side filtering on fields like `outcomePrices`.
+### Per-endpoint pagination rules
+
+| Endpoint | Default | Max per page | Pagination params | Has `hasMore`? |
+|----------|---------|-------------|-------------------|---------------|
+| `/markets` | 20 | 500 | `limit` + `offset` | No |
+| `/events` | 20 | 500 | `limit` + `offset` | No |
+| `/tags` | 20 | 300 | `limit` + `offset` | No |
+| `/series` | 20 | 300 | `limit` + `offset` | No |
+| `/public-search` | 5 | 50 | `limit_per_type` + `page` (1-indexed) | Yes (`pagination.hasMore`, `pagination.totalResults`) |
+| `/trades` | 100 | 1,000 | `limit` + `offset` | No |
+| `/positions` | all | 500 | `limit` + `offset` | No |
+| `/closed-positions` | 10 | 50 | `limit` + `offset` | No |
+| `/activity` | 100 | 1,000 | `limit` + `offset` | No |
+| `/holders` | 5/token | 500+/token | `limit` + `offset` | No |
+| `/oi`, `/value` | — | — | No pagination (single result) | — |
+
+For offset-based endpoints without `hasMore`, check if the returned array length equals `limit` — if so, there may be more pages. Continue incrementing `offset` until the returned array is shorter than `limit`.
+
+**Important**: Polymarket has tens of thousands of active markets. For screener-type queries (e.g. filtering all markets by odds or expiry), you MUST paginate through all pages. Stopping after the first page can miss the vast majority of matching results. Use server-side filters (`volume_num_min`, `liquidity_num_max`, `end_date_min/max`, `tag_id`, `volume_min`) to reduce the dataset before client-side filtering on fields like `outcomePrices`.
 
 ## Python examples
 
