@@ -77,8 +77,6 @@ The `/prices-history` endpoint uses a **token ID** as its `market` parameter (no
 | `/price?side=buy` | CLOB | Real-time Ask (cost to buy) | Real-time | **= website displayed price** |
 | `/price?side=sell` | CLOB | Real-time Bid (proceeds from selling) | Real-time | One spread lower |
 
-**Guidance**: When the user asks for "current price" or "odds", use `/price?side=buy` to match what they see on the Polymarket website. Use `/midpoint` for unbiased mid-market estimates. The Gamma `outcomePrices` field is convenient for bulk screening but may be stale.
-
 ### Order book (`/book`)
 
 **Request parameters**

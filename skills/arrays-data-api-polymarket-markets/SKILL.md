@@ -67,7 +67,7 @@ To get prices for a market, extract `clobTokenIds` from the Gamma `/markets` res
 |-------|------|----------|-------------|
 | `limit` | int | no | Results per page |
 | `offset` | int | no | Pagination offset |
-| `order` | string | no | Sort field. Supported values: `volume`, `volume24hr`, `volume1wk`, `volume1mo`, `volume1yr`, `liquidity`, `competitive`, `created_at`. `competitive` sorts by `abs(price - 0.5)` ascending (closest to 50/50 first) — it is a sort order only, not a filter. There are no `odds_min`/`odds_max` filter params; use `competitive` sort + client-side filtering instead. Note: `comment_count` is NOT supported (returns 422). |
+| `order` | string | no | Sort field. Supported values: `volume`, `volume24hr`, `volume1wk`, `volume1mo`, `volume1yr`, `liquidity`, `competitive`, `created_at`. `competitive` = closest to 50/50 first (sort only, no odds filter params exist). |
 | `ascending` | bool | no | Sort direction |
 | `id` | string | no | Filter by market ID |
 | `slug` | string | no | Filter by slug |
@@ -138,7 +138,7 @@ To get prices for a market, extract `clobTokenIds` from the Gamma `/markets` res
 |-------|------|----------|-------------|
 | `limit` | int | no | Results per page |
 | `offset` | int | no | Pagination offset |
-| `order` | string | no | Sort field |
+| `order` | string | no | Sort field. Supported values: `volume`, `volume24hr`, `volume1wk`, `volume1mo`, `volume1yr`, `liquidity`, `competitive`. |
 | `ascending` | bool | no | Sort direction |
 | `id` | string | no | Filter by event ID |
 | `slug` | string | no | Filter by slug |
