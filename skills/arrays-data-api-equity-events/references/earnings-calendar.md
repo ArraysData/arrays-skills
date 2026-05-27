@@ -14,19 +14,13 @@ Earnings calendar data with optional filtering by symbol and/or date range.
 | `start_time` | integer | No | Start timestamp (Unix seconds, int64 UTC) - optional, requires end_time |
 | `end_time` | integer | No | End timestamp (Unix seconds, int64 UTC) - optional, requires start_time |
 
-**Response**: `data[]` is an array grouped by date. Each item has:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `date` | string | Earnings date (YYYY-MM-DD) |
-| `entries` | array | Array of earnings entries for that date |
-
-Each object in `entries[]`:
+**Response**: `data[]` is a flat array of earnings calendar records. Each object in `data[]`:
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Unique identifier |
 | `symbol` | string | Stock symbol |
+| `date` | string | Earnings date (YYYY-MM-DD) |
 | `eps` | string | Actual earnings per share |
 | `eps_estimated` | string | Estimated earnings per share |
 | `time` | string | Earnings call time (e.g., "amc", "bmo") |
@@ -34,7 +28,6 @@ Each object in `entries[]`:
 | `revenue_estimated` | string | Estimated revenue |
 | `fiscal_date_ending` | string | Fiscal period end date |
 | `updated_from_date` | string | Date the data was updated from |
-| `status` | string | Earnings status |
 | `created_at` | string | Record creation timestamp |
 | `updated_at` | string | Record last-update timestamp |
 

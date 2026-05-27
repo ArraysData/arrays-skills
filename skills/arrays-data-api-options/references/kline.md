@@ -12,11 +12,10 @@ Get historical K-line data for options contracts. Provides OHLCV metrics, VWAP, 
 |-------|------|----------|-------------|
 | `symbol` | string | yes | Underlying symbol (e.g. `SPY`, `AAPL`) |
 | `options_ticker` | string | yes | OCC-format options ticker (e.g. `O:SPY260620C00570000`) |
-| `interval` | string | yes | Time interval: `1min`, `5min`, `15min`, `30min`, `1h`, `1d`, `1w`, `1m` |
+| `interval` | string | yes | Time interval: `1min`, `2min`, `3min`, `5min`, `10min`, `15min`, `30min`, `45min`, `1h`, `2h`, `4h`, `1d`, `1w`, `1m` |
 | `start_time` | int | yes | Start time (Unix seconds) |
 | `end_time` | int | yes | End time (Unix seconds) |
 | `limit` | int | no | Max data points (default 500, max 10000) |
-| `session` | string | no | Trading session: `RTH` (regular hours 9:30–16:15 ET) or `ETH` (default, all hours). Uppercase only. |
 
 ## Response
 

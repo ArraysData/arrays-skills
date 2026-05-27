@@ -44,7 +44,7 @@ ts = int(calendar.timegm(datetime(2025, 8, 13, 0, 0, 0, tzinfo=timezone.utc).tim
   - `ipo-calendar` — IPO calendar
   - `ipo-confirmed-calendar` — confirmed IPO calendar
   - `mergers-acquisitions` — M&A events
-  - `mergers-acquisitions/rss` — M&A RSS feed
+
   - `equity-offering` — equity/fundraising offerings
   - `crowdfunding/offerings` — crowdfunding offerings
 
@@ -60,7 +60,7 @@ ts = int(calendar.timegm(datetime(2025, 8, 13, 0, 0, 0, tzinfo=timezone.utc).tim
 | GET | `ipo-calendar` | `ipo-calendar` | Ipo Calendar |
 | GET | `ipo-confirmed-calendar` | `ipo-confirmed-calendar` | Ipo Confirmed Calendar |
 | GET | `mergers-acquisitions` | `mergers-acquisitions` | Mergers Acquisitions |
-| GET | `mergers-acquisitions/rss` | `mergers-acquisitions-rss` | Mergers Acquisitions Rss |
+
 | GET | `equity-offering` | `equity-offering` | Equity Offering |
 | GET | `crowdfunding/offerings` | `crowdfunding-offerings` | Crowdfunding — Offerings |
 
@@ -103,9 +103,8 @@ resp = requests.get(f"{base}/api/v1/stocks/earnings-calendar",
     params={"symbol": "AAPL", "start_time": 1735689600, "end_time": 1751241600},
     headers={"X-API-Key": key})
 body = resp.json()
-for day in body["data"]:
-    for e in day["entries"]:
-        print(f"{day['date']}: EPS={e['eps']}, Revenue={e['revenue']}")
+for e in body["data"]:
+    print(f"{e['date']}: EPS={e['eps']}, Revenue={e['revenue']}")
 
 # Earnings transcript — use body["data"]
 resp = requests.get(f"{base}/api/v1/stocks/earnings-transcript",

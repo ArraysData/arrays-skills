@@ -30,10 +30,12 @@ ts = int(datetime(2026, 4, 10, tzinfo=ET).timestamp())
 
 ## Endpoints
 
+- **Prefix**: `/api/v1/options/`
+
 | Method | Path | File | Description |
 |--------|------|------|-------------|
-| GET | `options/contracts` | `contracts` | Option contract specifications and metadata |
-| GET | `options/kline` | `kline` | Historical OHLCV and VWAP data for a specific option contract |
+| GET | `contracts` | `contracts` | Option contract specifications and metadata |
+| GET | `kline` | `kline` | Historical OHLCV and VWAP data for a specific option contract |
 
 > For detailed parameters, response fields, and examples for a specific endpoint, read `references/<file>.md` in this skill directory.
 

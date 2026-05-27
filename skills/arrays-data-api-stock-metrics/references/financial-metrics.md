@@ -19,7 +19,7 @@
 |-------|------|-------------|
 | `symbol` | string | Stock symbol (e.g. `AAPL`) |
 | `metric` | string | Metric type identifier (e.g. `REVENUE_TTM`) |
-| `values` | array | Time series data points |
+| `values` | array | Time series data points, sorted newest first (descending by `observed_at`). |
 
 Each entry in `values`:
 

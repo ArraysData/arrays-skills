@@ -25,6 +25,8 @@ ts = int(calendar.timegm(datetime(2025, 8, 13, 0, 0, 0, tzinfo=timezone.utc).tim
 
 ## Endpoints
 
+- **Prefix**: `/api/v1/crypto/`
+
 | Method | Path | File | Description |
 |--------|------|------|-------------|
 | GET | `exchange-flows` | `exchange-flows` | Exchange flows |

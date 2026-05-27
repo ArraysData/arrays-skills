@@ -70,7 +70,7 @@ resp = requests.get(f"{base}/api/v1/stocks/market-metrics",
     headers={"X-API-Key": key})
 body = resp.json()
 for item in body["data"]:
-    for v in item["values"]:
+    for v in item["values"]:  # values sorted newest first (descending by observed_at)
         print(f"{v['date']}: {v['value']}")
 
 # Darkpool trades at a specific hour

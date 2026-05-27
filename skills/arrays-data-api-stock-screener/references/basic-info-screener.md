@@ -1,15 +1,38 @@
 # Basic-info screener endpoints
 
-`GET /api/v1/stocks/screener/basic-info/{sub}`
+Four separate endpoints, each filtering by a different dimension. The query parameter name matches the endpoint suffix.
 
-Each takes a single required parameter:
+### `GET /api/v1/stocks/screener/basic-info/country?country={code}`
 
-| Endpoint | Param | Values |
-|----------|-------|--------|
-| `screener/basic-info/country` | `country` | ISO alpha-2 codes: `US`, `CN`, `JP`, `GB`, `DE`, etc. |
-| `screener/basic-info/exchange` | `exchange` | `AMEX`, `NASDAQ`, `NYSE` |
-| `screener/basic-info/sector` | `sector` | Same GICS sectors as company screener |
-| `screener/basic-info/industry` | `industry` | e.g. `Semiconductors`, `Banks Regional`, `Software Application` |
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `country` | string | yes | ISO 3166-1 alpha-2 country code |
+
+Accepted values (57): `AE`, `AR`, `AU`, `BE`, `BM`, `BR`, `BS`, `CA`, `CH`, `CI`, `CL`, `CN`, `CO`, `CR`, `CY`, `DE`, `DK`, `ES`, `FI`, `FR`, `GB`, `GG`, `GI`, `GR`, `HK`, `ID`, `IE`, `IL`, `IN`, `IS`, `IT`, `JE`, `JO`, `JP`, `KR`, `KY`, `KZ`, `LU`, `MC`, `MO`, `MX`, `MY`, `NL`, `NO`, `PA`, `PE`, `PH`, `SE`, `SG`, `TH`, `TR`, `TW`, `US`, `UY`, `VG`, `VN`, `ZA`
+
+### `GET /api/v1/stocks/screener/basic-info/exchange?exchange={name}`
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `exchange` | string | yes | Exchange name |
+
+Accepted values: `AMEX`, `NASDAQ`, `NYSE`
+
+### `GET /api/v1/stocks/screener/basic-info/sector?sector={name}`
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `sector` | string | yes | Sector name (screaming snake case) |
+
+Accepted values: `BASIC_MATERIALS`, `COMMUNICATION_SERVICES`, `CONSUMER_CYCLICAL`, `CONSUMER_DEFENSIVE`, `ENERGY`, `FINANCIAL_SERVICES`, `HEALTHCARE`, `INDUSTRIALS`, `REAL_ESTATE`, `TECHNOLOGY`, `UTILITIES`
+
+### `GET /api/v1/stocks/screener/basic-info/industry?industry={name}`
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `industry` | string | yes | Industry name (title case with spaces) |
+
+154 accepted values. Examples: `Advertising Agencies`, `Aerospace And Defense`, `Airlines Airports And Air Services`, `Auto Manufacturers`, `Banks Regional`, `Biotechnology`, `Computer Hardware`, `Consumer Electronics`, `Drug Manufacturers General`, `Financial Capital Markets`, `Gold`, `Information Technology Services`, `Insurance Life`, `Internet Content And Information`, `Medical Devices`, `Oil And Gas Integrated`, `Railroads`, `Real Estate Services`, `Reit Residential`, `Renewable Utilities`, `Restaurants`, `Semiconductors`, `Software Application`, `Software Infrastructure`, `Solar`, `Steel`, `Telecommunications Services`, `Waste Management` (full list at `https://internal-data-tools.prd.space.id/docs/output/v1_stocks_screener_basic-info_industry_get.json`)
 
 **Response fields** (each item in `data` array):
 

@@ -9,35 +9,41 @@
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
 | `indicator_type` | string | yes | Indicator type enum (see list below) |
-| `time_type` | string | yes | Time filter type: `OBSERVED_AT` (filter by publish timestamp) or `CALENDAR_START_DATE` (filter by calendar date) |
+| `time_type` | string | yes | Time filter type (see definitions below) |
 | `start_time` | integer | yes | Start time (Unix timestamp in seconds) |
 | `end_time` | integer | yes | End time (Unix timestamp in seconds, must be > start_time) |
 
-**Supported `indicator_type` values** (36 indicators):
+**`time_type` definitions:**
+- `CALENDAR_START_DATE` — Filter by the calendar date that the observation represents (e.g., `2024-01-01` for Jan 2024 data). Use this when asking "what was the value for a given period."
+- `RELEASE_DATE` — Filter by release/vintage date (when the data revision was published by FRED). All revisions are included with their respective release dates. Use this when asking "was data released on a specific date."
+- `OBSERVED_AT` — Filter by observation publish timestamp (usually the first second of the next day after the release date). Use for point-in-time (PIT) safe backtesting.
+
+**Supported `indicator_type` values** (34 indicators):
 
 - GDP indicators: `GDP`, `REAL_GDP`, `REAL_GDP_PER_CAPITA`
 - Employment: `INITIAL_CLAIMS`, `UNEMPLOYMENT_RATE`, `TOTAL_NONFARM_PAYROLL`
-- Interest rates: `FEDERAL_FUNDS`
-- Inflation / prices: `CPI`, `CORE_CPI`, `INFLATION_RATE_YOY` (published annually), `PPI`
+- Interest rates: `FEDERAL_FUNDS` (Federal Funds Effective Rate, not the target range)
+- Inflation / prices: `CPI`, `CORE_CPI`, `INFLATION_RATE_YOY` (published annually), `CORE_PPI` (Core PPI - Final Demand Less Foods and Energy), `PPI_FINAL_DEMAND` (PPI Final Demand)
+  - **PPI default**: When a user asks about "PPI" or "Producer Price Index" without further qualification, use `CORE_PPI`.
+  - **Monthly YoY inflation**: `INFLATION_RATE_YOY` is annual only. To calculate monthly YoY inflation, fetch `CPI` for the target month and the same month one year prior, then compute `(CPI_current - CPI_prior) / CPI_prior`.
 - Consumer: `CONSUMER_SENTIMENT`, `CONSUMER_INFLATION_EXPECTATIONS`, `RETAIL_SALES`
 - Production: `DURABLE_GOODS`, `INDUSTRIAL_PRODUCTION`
 - Recession: `SMOOTHED_RECESSION_PROBABILITIES`
-- TIPS (Treasury Inflation-Indexed): `TIPS_2_YEAR`, `TIPS_5_YEAR`, `TIPS_10_YEAR`, `TIPS_20_YEAR`, `TIPS_30_YEAR`
+- TIPS (Treasury Inflation-Indexed): `TIPS_5_YEAR`, `TIPS_10_YEAR`, `TIPS_20_YEAR`, `TIPS_30_YEAR`
 - Volatility: `VIX`, `GOLD_VIX`, `CRUDE_OIL_VIX`, `RUSSELL_2000_VIX`
 - Treasury yields: `TREASURY_YIELD_1_MONTH`, `TREASURY_YIELD_3_MONTH`, `TREASURY_YIELD_6_MONTH`, `TREASURY_YIELD_2_YEAR`, `TREASURY_YIELD_5_YEAR`, `TREASURY_YIELD_10_YEAR`, `TREASURY_YIELD_20_YEAR`, `TREASURY_YIELD_30_YEAR`
 
 **Important tips for `time_type`:**
-- Use `CALENDAR_START_DATE` to filter by the period the data refers to (e.g., January 2025 CPI = date `2025-01-01`).
-- Use `OBSERVED_AT` to filter by the date the data was published/released.
-- **If `CALENDAR_START_DATE` returns empty for a recent period**, try widening the window by +/- 30 days, or switch to `OBSERVED_AT`.
-- **To check if a specific indicator was announced on a given date**: Use `time_type=OBSERVED_AT` with `start_time`/`end_time` covering that day. Then check the `date` field in the response to see which period the released data refers to.
+- `CALENDAR_START_DATE` — Filter by the calendar date that the observation represents (e.g., `2024-01-01` for Jan 2024 data). Use this when asking "what was the value for a given period."
+- `RELEASE_DATE` — Filter by release/vintage date (when the data revision was published by FRED). All revisions are included with their respective release dates. Use this when asking "was data released on a specific date."
+- `OBSERVED_AT` — Filter by observation publish timestamp (usually the first second of the next day after the release date). Use for point-in-time (PIT) safe backtesting.
 - **CRITICAL: Always filter observations by the `date` field.** The `observations` array may contain data for multiple months/quarters. Do NOT blindly use `observations[0]` — instead, match the `date` field to the target period. For example, when querying January 2025 data, filter for `date` starting with `"2025-01"`:
 ```python
 obs = [o for o in indicator["observations"] if o["date"].startswith("2025-01")]
 value = obs[0]["value"] if obs else None
 ```
 
-**Response** — `data` is an array containing one object with `series` and `observations`:
+**Response** — `data` is an array containing one object with `series` and `observations`. Observations are returned in **reverse-chronological order**. If an indicator has been revised, multiple observations for the same `date` may appear, each with a different `release_date`:
 ```json
 {
   "success": true,
@@ -57,7 +63,7 @@ value = obs[0]["value"] if obs else None
 |-------|------|-------------|
 | `data[0].series.name` | string | Series ID (e.g. `GDP`) |
 | `data[0].series.title` | string | Series title (e.g. `Gross Domestic Product`) |
-| `data[0].series.seasonal_adjustment` | string | Seasonal adjustment type |
+| `data[0].series.seasonal_adjustment` | string | Seasonal adjustment type (e.g. `Seasonally Adjusted Annual Rate`, `Seasonally Adjusted`, `Not Seasonally Adjusted`) |
 | `data[0].series.frequency` | string | Data frequency (e.g. `Quarterly`) |
 | `data[0].series.units` | string | Data units (e.g. `Billions of Dollars`) |
 | `data[0].series.notes` | string | Series notes/description (optional) |

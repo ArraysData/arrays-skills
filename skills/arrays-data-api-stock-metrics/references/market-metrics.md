@@ -33,7 +33,7 @@ Retrieve time series data for various market indicators, including technical and
 |-------|------|-------------|
 | `symbol` | string | Stock symbol (e.g., AAPL) |
 | `type` | string | Indicator type (e.g., MA_20) |
-| `values` | array | Array of time series data points |
+| `values` | array | Array of time series data points, sorted newest first (descending by `observed_at`). |
 
 Each element in `values` (`MarketMetricValue`):
 

@@ -1,12 +1,12 @@
 ---
-name: arrays-data-api-ask
+name: arrays-data-api-news
 description: Guides the agent to call Arrays REST APIs for market news. Use when the user needs market news articles.
 ---
 
 
-# Arrays Data API — Ask (News)
+# Arrays Data API — News
 
-**Domain**: `ask`. Market news.
+**Domain**: `news`. Market news.
 
 ## Base URL and auth
 

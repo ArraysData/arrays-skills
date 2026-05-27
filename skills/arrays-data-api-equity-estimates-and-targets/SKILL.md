@@ -15,6 +15,8 @@ description: Calls Arrays REST APIs for equity estimates and price targets — a
 
 ## Endpoints
 
+- **Prefix**: `/api/v1/stocks/`
+
 | Method | Path | File | Description |
 |--------|------|------|-------------|
 | GET | `company/price-target-news` | `company-price-target-news` | Price target news |

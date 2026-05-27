@@ -1,27 +1,55 @@
-# Time range variants
+# Financial metrics screener — time range
 
 `GET /api/v1/stocks/screener/financial-metrics/timerange`
 
-Same as snapshot variants but replace `snapshot` with:
+Same filtering as `screener/financial-metrics` but over a date range. Results are grouped by date (`YYYY-MM-DD`).
+
+## Parameters
 
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
-| `start_time` | int | yes | Start (Unix seconds) |
-| `end_time` | int | yes | End (Unix seconds) |
-| `limit` | int | no | Max results per day |
+| `start_time` | integer | yes | Start time (Unix seconds, UTC) |
+| `end_time` | integer | yes | End time (Unix seconds, UTC) |
+| `metric_type` | string | yes | Financial metric (same list as `screener-financial-metrics.md`) |
+| `range_min` | float64 | no | Min value filter — returns stocks with value ≥ `range_min` |
+| `range_max` | float64 | no | Max value filter — returns stocks with value ≤ `range_max` |
+| `order_by` | string | no | Sort by metric value within each day: `ASC` or `DESC` (default `DESC`) |
+| `limit` | integer | no | Max results per day (default no limit) |
 
-**Response fields** (each item in `data` array is a date group):
+## Response
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "date": "2026-04-24",
+      "items": [
+        {
+          "symbol": "NVDA",
+          "snapshot_time": 1777060800,
+          "metric": "MARKET_CAP",
+          "value": 5062002467464.28
+        }
+      ]
+    }
+  ],
+  "request_id": "..."
+}
+```
+
+**Each item in `data` (date bucket):**
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `date` | string | Date in `YYYY-MM-DD` format |
-| `items` | array | Array of stock metric data for this date |
+| `date` | string | Date for this bucket (`YYYY-MM-DD`) |
+| `items` | array | Stocks matching the filter on this date |
 
-Each object in the `items` array:
+**Each object in `items`:**
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `symbol` | string | Stock ticker symbol (e.g. `AAPL`) |
-| `snapshot_time` | integer | Snapshot time as Unix timestamp in seconds (UTC) |
-| `metric` | string | Metric type that was queried (e.g. `PE_RATIO`, `MA_5`) |
-| `value` | number | Metric value for this stock |
+| `snapshot_time` | int64 | Snapshot time for this row (Unix seconds, UTC) |
+| `metric` | string | Metric type that was queried (echoes `metric_type`) |
+| `value` | float64 | Metric value for this stock on this date |

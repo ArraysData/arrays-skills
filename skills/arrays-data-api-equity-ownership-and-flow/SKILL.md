@@ -31,6 +31,8 @@ Access data in Python: `body["data"]`
 
 ## Endpoints
 
+- **Prefix**: `/api/v1/stocks/`
+
 | Method | Path | File | Description |
 |--------|------|------|-------------|
 | GET | `institution-holder` | `institution-holder` | Institution Holder |
