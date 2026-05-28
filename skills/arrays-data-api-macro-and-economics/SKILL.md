@@ -1,12 +1,12 @@
 ---
 name: arrays-data-api-macro-and-economics
-description: Guides the agent to call Arrays REST APIs for macro and economics data (treasury rates, economic calendar/indicators, CPI, GDP, unemployment, inflation, consumer sentiment, macro index/forex/commodity, VIX). Use when the user asks about macroeconomic indicators, CPI release dates, economic data announcements, interest rates, forex, commodity prices (gold GCUSD, silver SILUSD, oil CLUSD), market index data (S&P 500 ^SPX, Dow Jones ^DJI, Nasdaq ^IXIC), or VIX volatility indexes.
+description: Guides the agent to call Arrays REST APIs for macro and economics data (treasury rates, economic indicators, CPI, GDP, unemployment, inflation, consumer sentiment, macro index/forex/commodity, VIX). Use when the user asks about macroeconomic indicators, CPI release dates, economic data announcements, interest rates, forex, commodity prices (gold GCUSD, silver SILUSD, oil CLUSD), market index data (S&P 500 ^SPX, Dow Jones ^DJI, Nasdaq ^IXIC), or VIX volatility indexes.
 ---
 
 
 # Arrays Data API — Macro and Economics
 
-**Domain**: `macro_and_economics_data`. Treasury rates, economic calendar, economic indicators, macro index/forex/commodity historical and real-time data, and VIX.
+**Domain**: `macro_and_economics_data`. Treasury rates, economic indicators, macro index/forex/commodity historical and real-time data, and VIX.
 
 ## Base URL and auth
 
@@ -23,36 +23,22 @@ All endpoints return a unified JSON envelope:
 - Access data in Python: `body["data"]`
 - Always check `body["success"]` before accessing data.
 
-## Path prefix and endpoints
-
-### Macro prefix — `/api/v1/macro/`
-- **Paths** (all GET):
-  - `economic-indicators` — economic indicators (CPI, GDP, unemployment, etc.)
-  - `index/historical` — index historical data
-  - `index/real-time` — index real-time data
-  - `index/symbols` — available index symbols
-  - `forex/historical` — forex historical data
-  - `forex/real-time` — forex real-time data
-  - `forex/symbols` — available forex symbols
-  - `commodity/historical` — commodity historical data
-  - `commodity/real-time` — commodity real-time data
-  - `commodity/symbols` — available commodity symbols
-  - `treasury-rates` — US treasury yield rates
-
 ## Endpoints
+
+- **Prefix**: `/api/v1/macro/`
 
 | Method | Path | File | Description |
 |--------|------|------|-------------|
-| GET | `macro/economic-indicators` | `economic-indicators` | 2. Economic indicators |
-| GET | `macro/index/historical` | `macro-index-historical` | 3. Historical data |
-| GET | `macro/forex/historical` | `macro-forex-historical` | 3. Historical data |
-| GET | `macro/commodity/historical` | `macro-commodity-historical` | 3. Historical data |
-| GET | `macro/index/real-time` | `macro-index-real-time` | 4. Real-time data |
-| GET | `macro/forex/real-time` | `macro-forex-real-time` | 4. Real-time data |
-| GET | `macro/commodity/real-time` | `macro-commodity-real-time` | 4. Real-time data |
-| GET | `macro/forex/symbols` | `macro-forex-symbol-list` | 5. Symbol lists |
-| GET | `macro/commodity/symbols` | `macro-commodity-symbol-list` | 5. Symbol lists |
-| GET | `macro/treasury-rates` | `rates` | 7. Treasury rates |
+| GET | `economic-indicators` | `economic-indicators` | Economic indicators (CPI, GDP, unemployment, etc.) |
+| GET | `index/historical` | `macro-index-historical` | Index historical data |
+| GET | `forex/historical` | `macro-forex-historical` | Forex historical data |
+| GET | `commodity/historical` | `macro-commodity-historical` | Commodity historical data |
+| GET | `index/real-time` | `macro-index-real-time` | Index real-time data |
+| GET | `forex/real-time` | `macro-forex-real-time` | Forex real-time data |
+| GET | `commodity/real-time` | `macro-commodity-real-time` | Commodity real-time data |
+| GET | `forex/symbols` | `macro-forex-symbol-list` | Available forex symbols |
+| GET | `commodity/symbols` | `macro-commodity-symbol-list` | Available commodity symbols |
+| GET | `treasury-rates` | `rates` | US treasury yield rates |
 
 > For detailed parameters, response fields, and examples for a specific endpoint, read `references/<file>.md` in this skill directory.
 

@@ -8,7 +8,7 @@
 |-------|------|----------|-------------|
 | `chain_type` | int | yes | 0=BTC, 1=ETH, 2=BSC, 3=BASE, 4=SOL, 99=OTHER |
 | `symbol` | string | no | Filter by symbol (case-insensitive partial match) |
-| `limit` | int | yes | Items per page (default 10, max 500) |
+| `limit` | int | no | Items per page (default 10, max 500) |
 | `offset` | int | no | Pagination offset (default 0) |
 
 **Response fields** — `data` is an array of token objects:

@@ -1,12 +1,12 @@
 ---
 name: arrays-data-api-spot-market-price-and-volume
-description: Calls Arrays REST APIs for spot market prices and volume — stock and crypto price/volume/candlestick/kline/OHLCV data, token details, and previous close. Use when the user asks for raw price/volume/OHLCV/candlestick/kline data. For metrics including market cap, crypto supply, moving averages, EMA, SMA, RSI, MACD, Bollinger Bands, VWAP, beta, volatility, PE ratio, PB ratio, PS ratio, dividend yield, enterprise value, EV/EBITDA, price change percentages (1d/1w/1M/3M/6M/YTD/1Y), use arrays-data-api-stock-metrics for stocks and arrays-data-api-crypto-metrics-and-screener for crypto.
+description: Calls Arrays REST APIs for spot market prices and volume — stock and crypto spot price/volume/candlestick/kline/OHLCV data on Binance (spot USDT) and Hyperliquid (spot USDC), and token detail metadata. Use when the user asks for raw spot price/volume/OHLCV/candlestick/kline data, Binance or Hyperliquid spot prices, or HYPE candles. For perpetual futures kline / volume / funding rate / open interest / long-short ratio / taker buy-sell volume / HIP-3 tokenized equities (AAPL, TSLA on Hyperliquid), use arrays-data-api-crypto-futures-data. For metrics including market cap, crypto supply, moving averages, EMA, SMA, RSI, MACD, Bollinger Bands, VWAP, beta, volatility, PE ratio, PB ratio, PS ratio, dividend yield, enterprise value, EV/EBITDA, price change percentages (1d/1w/1M/3M/6M/YTD/1Y), use arrays-data-api-stock-metrics for stocks and arrays-data-api-crypto-metrics-and-screener for crypto.
 ---
 
 
 # Arrays Data API — Spot Market Price and Volume
 
-Stock and crypto kline/OHLCV, token detail by symbol, previous close, and full bar data.
+Stock and crypto spot kline/OHLCV (Binance USDT, Hyperliquid USDC) and token detail by symbol.
 
 ## Base URL and auth
 
@@ -15,17 +15,20 @@ Stock and crypto kline/OHLCV, token detail by symbol, previous close, and full b
 
 ## Important notes
 
-- **Data ordering**: Kline results are returned in **reverse chronological order** (latest first). Always match by `time_period_start` to get a specific date, or use `data[0]` to get the most recent data point.
-- **Timestamp Rule**: Date fields are stored in UTC for crypto data and US Eastern time (ET) for US stocks. To include a full day's data, set `end_time` to midnight of the **next** day — e.g. for US stock data on 2024-12-31: `end_time = int(datetime(2025, 1, 1, 0, 0, 0, tzinfo=ET).timestamp())`; for crypto on 2024-12-31: `end_time = int(datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc).timestamp())`
+- **Data ordering**: All kline endpoints return **reverse chronological** (latest first; use `data[0]` or match by timestamp). `stocks/kline` uses `time_period_start`; new crypto endpoints use `time_open`.
+- **`volume` unit**: All endpoints return `volume` in **base-asset units** (BTC, ETH, HYPE, shares, etc.) — multiply by a representative bar price for notional. `stocks/kline` uses the legacy field name `volume_traded`.
+- **Quote currency scope**: Binance only via **USDT** pairs; Hyperliquid only via **USDC** pairs. Other quote currencies (Binance `USDC/FDUSD/BTC`, Hyperliquid HIP-3 `USDH/USDE/USDT` etc.) are not exposed by these endpoints.
+- **Timestamp Rule**: Date fields are stored in UTC for crypto data and US Eastern time (ET) for US stocks. A bar is only returned if the query range fully contains `[time_open, time_close]`.
+- **Bar boundaries**: Stock intraday RTH: 9:30–16:00 ET; intraday ETH: 4:00–20:00 ET. `1d`: 9:30–16:00 ET (RTH only). `1w`/`1m`/`3m`: midnight ET. Crypto: midnight UTC.
+- **Session filter**: `session=ETH` is only valid for intraday intervals. Using it with `1d` or higher returns an error.
 
 ## Crypto — `/api/v1/crypto/`
 
 | Method | Path | File | Description |
 |--------|------|------|-------------|
 | GET | `detail` | `crypto-detail` | Token detail by symbol |
-| GET | `kline` | `crypto-kline` | Crypto kline (candlestick) data (use this for BTC, ETH price queries) |
-| GET | `ohlcv` | `crypto-ohlcv` | Crypto OHLCV full bar data (requires specific trading pair) |
-| GET | `futures/ohlcv` | `crypto-futures-ohlcv` | Crypto futures OHLCV data — use this for "futures trading volume" queries. `volume_traded` is in **quote currency (USDT)**, no conversion needed. Symbol format: `ETHUSDT`, `BTCUSDT` |
+| GET | `binance/spot/usdt/kline` | `binance-spot-usdt-kline` | Binance spot USDT kline (default for BTC, ETH, etc. when no exchange is named) |
+| GET | `hyperliquid/spot/usdc/kline` | `hyperliquid-spot-usdc-kline` | Hyperliquid spot USDC kline (use for HYPE, or when the user explicitly says "on Hyperliquid") |
 
 ### Stocks — `/api/v1/stocks/`
 
@@ -35,25 +38,23 @@ Stock and crypto kline/OHLCV, token detail by symbol, previous close, and full b
 
 ## Parameters by endpoint
 
-### Kline endpoints (`crypto/kline`, `stocks/kline`, `crypto/ohlcv`, etc.)
+### Kline endpoints (`crypto/binance/spot/usdt/kline`, `crypto/hyperliquid/spot/usdc/kline`, `stocks/kline`)
 
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
-| `symbol` | string | yes | Token symbol (e.g. `BTC`, `ETH`) or stock symbol (e.g. `AAPL`, `TSLA`) |
+| `symbol` | string | yes | Base token (e.g. `BTC`, `ETH`, `HYPE`) for crypto — never `BTCUSDT`, the quote currency is fixed in the URL path. Stock symbol (e.g. `AAPL`, `TSLA`) for `stocks/kline`. |
 | `start_time` | int | yes | Start time (Unix seconds). Must be > 0 |
 | `end_time` | int | yes | End time (Unix seconds). Must be > start_time |
-| `interval` | string | yes | Time interval: `1min`, `2min`, `3min`, `5min`, `10min`, `15min`, `30min`, `45min`, `1h`, `2h`, `4h`, `1d`, `1w`, `1m`, `3m`, `6m` |
+| `interval` | string | yes | `1min`, `2min`, `3min`, `5min`, `10min`, `15min`, `30min`, `45min`, `1h`, `2h`, `4h`, `1d`, `1w`, `1m`, `3m`, `6m` (Binance + stocks). Hyperliquid is narrower: `1min`, `5min`, `15min`, `30min`, `1h`, `4h`, `1d`, `1w`, `1m`. |
 | `limit` | int | no | Max data points. Default 500, max 10000 |
-| `cursor` | string | no | Pagination cursor (only for `crypto/kline`) |
 
 ## Endpoints
 
 | Method | Path | File | Description |
 |--------|------|------|-------------|
 | GET | `crypto/detail` | `crypto-detail` | Token detail |
-| GET | `crypto/kline` | `crypto-kline` | Crypto kline |
-| GET | `crypto/ohlcv` | `crypto-ohlcv` | Crypto OHLCV full bar |
-| GET | `crypto/futures/ohlcv` | `crypto-futures-ohlcv` | Crypto futures OHLCV full bar |
+| GET | `crypto/binance/spot/usdt/kline` | `binance-spot-usdt-kline` | Binance spot USDT kline |
+| GET | `crypto/hyperliquid/spot/usdc/kline` | `hyperliquid-spot-usdc-kline` | Hyperliquid spot USDC kline |
 | GET | `stocks/kline` | `stocks-kline` | Stock kline |
 
 > For detailed parameters, response fields, and examples for a specific endpoint, read `references/<file>.md` in this skill directory.
@@ -81,7 +82,7 @@ lookback_start = target - timedelta(days=30)  # Jul 10
 start = to_ts(lookback_start.year, lookback_start.month, lookback_start.day)
 end = to_ts(2025, 8, 9)  # target date itself (NOT next day)
 
-resp = requests.get(f"{base}/api/v1/crypto/kline",
+resp = requests.get(f"{base}/api/v1/crypto/binance/spot/usdt/kline",
     params={"symbol": "BTC", "start_time": start, "end_time": end,
             "interval": "1d", "limit": 35},
     headers={"X-API-Key": key})
@@ -104,23 +105,25 @@ import requests, os
 base = os.environ["ARRAYS_API_BASE_URL"]
 key = os.environ["ARRAYS_API_KEY"]
 
-# Crypto kline
-resp = requests.get(f"{base}/api/v1/crypto/kline",
+# Binance spot kline (use for BTC, ETH, etc. when no exchange is named)
+resp = requests.get(f"{base}/api/v1/crypto/binance/spot/usdt/kline",
     params={"symbol": "ETH", "start_time": 1723420800, "end_time": 1723507200,
             "interval": "1d", "limit": 10},
     headers={"X-API-Key": key})
 body = resp.json()
-candles = body["data"]  # data array
+candles = body["data"]  # latest first
 for c in candles:
     print(f"Open: {c['price_open']}, Close: {c['price_close']}")
 
-# Crypto OHLCV full bar
-resp = requests.get(f"{base}/api/v1/crypto/ohlcv",
-    params={"symbol": "BTC", "start_time": 1723420800, "end_time": 1723507200,
+# Hyperliquid spot kline — note volume is in base-asset (HYPE), not USDC
+resp = requests.get(f"{base}/api/v1/crypto/hyperliquid/spot/usdc/kline",
+    params={"symbol": "HYPE", "start_time": 1762300800, "end_time": 1762560000,
             "interval": "1d", "limit": 10},
     headers={"X-API-Key": key})
 body = resp.json()
-bars = body["data"]  # data array
+for c in body["data"]:  # latest first
+    notional_usdc = c["volume"] * (c["price_open"] + c["price_close"]) / 2
+    print(f"Close: {c['price_close']}, vol_HYPE: {c['volume']}, ~vol_USDC: {notional_usdc:.0f}")
 
 # Stock kline — end_time must be midnight ET of the NEXT day
 from datetime import datetime, timezone, timedelta
@@ -135,22 +138,6 @@ body = resp.json()
 candles = body["data"]  # data array
 for c in candles:
     print(f"Close: {c['price_close']}")
-
-# Futures trading volume — use futures/ohlcv
-# volume_traded is already in quote currency (USDT), no price conversion needed
-import calendar
-from datetime import datetime, timezone
-def to_ts(y, m, d):
-    return int(calendar.timegm(datetime(y, m, d, tzinfo=timezone.utc).timetuple()))
-
-resp = requests.get(f"{base}/api/v1/crypto/futures/ohlcv",
-    params={"symbol": "ETHUSDT", "start_time": to_ts(2025, 9, 6),
-            "end_time": to_ts(2025, 9, 7), "interval": "1d", "limit": 5},
-    headers={"X-API-Key": key})
-body = resp.json()
-for bar in body["data"]:
-    if "2025-09-06" in bar.get("time_period_start", ""):
-        print(f"Futures volume: ${bar['volume_traded']:,.2f}")  # already in USDT
 ```
 
 ## Price Correlation Between Two Assets
@@ -161,7 +148,8 @@ To compute the correlation between two assets (e.g., BTC and TLT), use **Pearson
 
 ```python
 # Pearson correlation of price levels (NOT returns)
-btc_prices = {c["time_period_start"][:10]: c["price_close"] for c in btc_kline}
+# Crypto kline returns time_open as RFC 3339 string; stocks/kline still uses time_period_start
+btc_prices = {c["time_open"][:10]: c["price_close"] for c in btc_kline}
 tlt_prices = {c["time_period_start"][:10]: c["price_close"] for c in tlt_kline}
 common = sorted(set(btc_prices) & set(tlt_prices))
 bv = [btc_prices[d] for d in common]

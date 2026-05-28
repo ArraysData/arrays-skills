@@ -44,7 +44,7 @@ Each item in the `data` array:
 | `purchases_of_investments` | float64 | Purchases of investments |
 | `sales_maturities_of_investments` | float64 | Sales/maturities of investments |
 | `other_investing_activities` | float64 | Other investing activities |
-| `net_cash_provided_by_investing_activities` | float64 | Net cash from investing activities |
+| `net_cash_provided_by_investing_activities` | float64 | Net cash from investing activities. Negative means cash was spent on investments; positive means cash was received from selling investments |
 | `debt_repayment` | float64 | Debt repayment |
 | `common_stock_issuance` | float64 | Common stock issued |
 | `common_stock_repurchased` | float64 | Common stock repurchased |

@@ -9,11 +9,31 @@
 | `start_time` | integer | no | Start time (Unix timestamp in seconds). If omitted returns latest rates |
 | `end_time` | integer | no | End time (Unix timestamp in seconds). Must be strictly greater than `start_time` |
 
-**Response** — `data[0]["rates"]` is an array of rate objects:
+**Response** — `data` is an array of rate objects:
 ```json
-{ "success": true, "request_id": "...", "data": [ { "rates": [ { "date": "2025-01-15", "month1": 5.25, "year10": 4.50, ... } ] } ] }
+{ "success": true, "request_id": "...", "data": [ { "date": "2025-01-15", "month1": 5.25, "year10": 4.50, ... } ] }
 ```
-Access in Python: `body["data"][0]["rates"]`
+Access in Python: `body["data"]`
+
+**Python example:**
+```python
+import requests, os, calendar
+from datetime import datetime, timezone
+base = os.environ["ARRAYS_API_BASE_URL"]
+key = os.environ["ARRAYS_API_KEY"]
+
+def to_ts(y, m, d):
+    return int(calendar.timegm(datetime(y, m, d, tzinfo=timezone.utc).timetuple()))
+
+resp = requests.get(f"{base}/api/v1/macro/treasury-rates",
+    params={"start_time": to_ts(2024, 8, 5), "end_time": to_ts(2024, 8, 6)},
+    headers={"X-API-Key": key})
+body = resp.json()
+rates = body["data"]
+target = [r for r in rates if r["date"] == "2024-08-05"]
+if target:
+    print(f"10-Year yield: {target[0]['year10']}%")
+```
 
 | Field | Type | Description |
 |-------|------|-------------|

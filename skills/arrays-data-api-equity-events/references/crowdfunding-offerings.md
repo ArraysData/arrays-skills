@@ -20,7 +20,7 @@ Paginated crowdfunding offerings information from SEC filings.
 | `form_type` | string | Form type (e.g., "C/A") |
 | `form_signification` | string | Form description |
 | `industry` | string | Industry (may be empty) |
-| `filling_date` | string | Filing date |
+| `filing_date` | string | Filing date |
 | `date` | string | Offering date |
 | `name_of_issuer` | string | Issuer name |
 | `legal_status_form` | string | Legal form |

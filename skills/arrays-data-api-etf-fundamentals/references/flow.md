@@ -8,7 +8,7 @@ Retrieve ETF in/outflow data. Includes daily close, net flow in shares, volume, 
 
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
-| `tickers` | string | yes | Comma-separated ETF symbols (e.g., SPY,QQQ,IWM) |
+| `symbol` | string | yes | ETF symbols (e.g. SPY) |
 | `start_time` | integer | no | Start time (Unix timestamp in seconds) |
 | `end_time` | integer | no | End time (Unix timestamp in seconds) |
 

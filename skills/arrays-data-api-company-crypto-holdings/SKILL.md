@@ -1,6 +1,6 @@
 ---
 name: arrays-data-api-company-crypto-holdings
-description: Guides the agent to call Arrays REST APIs for company crypto holdings and transactions. Use when the user needs data about which companies hold crypto or their crypto transaction history.
+description: Guides the agent to call Arrays REST APIs for company crypto holdings. Use when the user needs data about which companies hold crypto.
 ---
 
 
@@ -25,7 +25,6 @@ description: Guides the agent to call Arrays REST APIs for company crypto holdin
 | Method | Path | File | Description |
 |--------|------|------|-------------|
 | GET | `holdings` | `crypto-holdings` | Company crypto holdings |
-| GET | `transactions` | `crypto-transactions` | Company crypto transactions |
 
 > For detailed parameters, response fields, and examples for a specific endpoint, read `references/<file>.md` in this skill directory.
 

@@ -1,25 +1,55 @@
-# Financial/technical metrics screener
+# Financial metrics screener
 
 `GET /api/v1/stocks/screener/financial-metrics`
 
+Includes companies with market cap > $5B at the snapshot time (current market caps may have since drifted below this threshold).
+
+## Parameters
+
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
-| `snapshot` | int | yes | Snapshot time (Unix seconds) |
-| `metric_type` | string | yes | Metric type (see lists below) |
-| `range_min` | float64 | no | Min value filter |
-| `range_max` | float64 | no | Max value filter |
-| `order_by` | string | no | `ASC` or `DESC` (default `DESC`) |
+| `snapshot` | integer | yes | Snapshot time (Unix seconds, used directly for querying) |
+| `metric_type` | string | yes | Financial metric to filter by (see list below) |
+| `range_min` | float64 | no | Min value filter — returns stocks with value ≥ `range_min` |
+| `range_max` | float64 | no | Max value filter — returns stocks with value ≤ `range_max` |
+| `order_by` | string | no | Sort by metric value: `ASC` or `DESC` (default `DESC`) |
 
-**Financial metric types**: `REVENUE_TTM`, `NET_INCOME_TTM`, `EPS_TTM`, `ROE_TTM`, `ROA_TTM`, `ROIC_TTM`, `GROSS_MARGIN_MRQ`, `OPERATING_MARGIN_MRQ`, `NET_MARGIN_MRQ`, `FCF_MARGIN_MRQ`, `CURRENT_RATIO_MRQ`, `DEBT_TO_EQUITY_MRQ`, `DEBT_TO_ASSETS_MRQ`, `NET_WORKING_CAPITAL_MRQ`, `QUICK_RATIO_MRQ`, `RD_TO_SALES_TTM`, `MARKET_CAP`, `PE_RATIO`, `PS_RATIO`, `PB_RATIO`, `DIVIDEND_YIELD`, `ENTERPRISE_VALUE`, `EV_EBITDA_RATIO`, and growth metrics (`REVENUE_GROWTH_QOQ`, `REVENUE_GROWTH_YOY_QUARTERLY`, `REVENUE_GROWTH_YOY_TTM`, `REVENUE_GROWTH_YOY_ANNUAL`, `EPS_GROWTH_QOQ`, `EPS_GROWTH_YOY_QUARTERLY`, `EPS_GROWTH_YOY_TTM`, `EPS_GROWTH_YOY_ANNUAL`, `FCF_GROWTH_QOQ`, `FCF_GROWTH_YOY_QUARTERLY`, `FCF_GROWTH_YOY_TTM`, `FCF_GROWTH_YOY_ANNUAL`)
+**Financial metric types:**
 
-**Technical metric types**: `PRICE_CHANGE_1D/1W/1M/3M/6M/YTD/1Y/3Y/5Y`, `SHARES_VOLUME`, `DOLLAR_VOLUME`, `AVERAGE_DAILY_DOLLAR_VOLUME`, `MA_5/10/20/60/120/200`, `EMA_5/10/20/60/120/200`, `RSI_14`, `MACD_DIF/DEA/HIST`, `BOLLINGER_UPPER/MID/LOWER`, `VWAP_DAY`, `BETA`, `VOLATILITY_20/60/90`
+- **PIT balance-sheet ratios (MRQ)**: `CURRENT_RATIO_MRQ`, `QUICK_RATIO_MRQ`, `DEBT_TO_ASSETS_MRQ`, `DEBT_TO_EQUITY_MRQ`, `NET_WORKING_CAPITAL_MRQ`
+- **TTM base metrics**: `REVENUE_TTM`, `NET_INCOME_TTM`, `EPS_TTM`
+- **TTM profitability**: `ROA_TTM`, `ROE_TTM`, `ROIC_TTM`
+- **MRQ margins**: `GROSS_MARGIN_MRQ`, `OPERATING_MARGIN_MRQ`, `NET_MARGIN_MRQ`, `FCF_MARGIN_MRQ`
+- **Other**: `RD_TO_SALES_TTM`
+- **Revenue growth**: `REVENUE_GROWTH_QOQ`, `REVENUE_GROWTH_YOY_QUARTERLY`, `REVENUE_GROWTH_YOY_TTM`, `REVENUE_GROWTH_YOY_ANNUAL`
+- **EPS growth**: `EPS_GROWTH_QOQ`, `EPS_GROWTH_YOY_QUARTERLY`, `EPS_GROWTH_YOY_TTM`, `EPS_GROWTH_YOY_ANNUAL`
+- **FCF growth**: `FCF_GROWTH_QOQ`, `FCF_GROWTH_YOY_QUARTERLY`, `FCF_GROWTH_YOY_TTM`, `FCF_GROWTH_YOY_ANNUAL`
+- **Price-derived valuation**: `MARKET_CAP`, `PE_RATIO`, `PS_RATIO`, `PB_RATIO`, `DIVIDEND_YIELD`, `ENTERPRISE_VALUE`, `EV_EBITDA_RATIO`
 
-**Response fields** (each item in `data` array):
+## Response
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "symbol": "NVDA",
+      "snapshot_time": 1777060800,
+      "date": "2026-04-24",
+      "metric": "MARKET_CAP",
+      "value": 5062002467464.28
+    }
+  ],
+  "request_id": "..."
+}
+```
+
+**Each item in `data`:**
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `symbol` | string | Stock ticker symbol (e.g. `AAPL`) |
-| `snapshot_time` | integer | Snapshot time as Unix timestamp in seconds (UTC) |
-| `date` | string | Snapshot date in `YYYY-MM-DD` format |
-| `metric` | string | Metric type that was queried (e.g. `PE_RATIO`, `MA_5`) |
-| `value` | number | Metric value for this stock |
+| `snapshot_time` | int64 | Snapshot time (Unix seconds, UTC) |
+| `date` | string | Snapshot date (`YYYY-MM-DD`) |
+| `metric` | string | Metric type that was queried (echoes `metric_type`) |
+| `value` | float64 | Metric value for this stock |

@@ -15,6 +15,8 @@ Market cap, supply, on-chain analytics (MVRV, NUPL, SOPR, etc.), fear & greed, c
 
 ## Endpoints
 
+- **Prefix**: `/api/v1/crypto/`
+
 | Method | Path | File | Description |
 |--------|------|------|-------------|
 | GET | `fear-greed-index` | `fear-greed-index` | Fear & greed index |
@@ -111,7 +113,7 @@ for item in body["data"]:
 To compute the correlation between Bitcoin and another asset (e.g., TLT, SPY, gold), fetch kline data for both assets, align on common dates, and compute **Pearson correlation of price levels** (NOT returns).
 
 **Steps**:
-1. Fetch BTC daily kline from `/api/v1/crypto/kline` (use `symbol=BTC`)
+1. Fetch BTC daily kline from `/api/v1/crypto/binance/spot/usdt/kline` (use `symbol=BTC`)
 2. Fetch the other asset's daily kline from `/api/v1/stocks/kline` (for stocks/ETFs like TLT, use `ticker=TLT`)
 3. Build date→close_price maps for both
 4. Find common dates (dates where both have data). TLT only trades on business days — use only dates present in BOTH datasets
@@ -133,8 +135,8 @@ def to_ts(y, m, d):
 start = to_ts(2025, 8, 28)
 end = to_ts(2025, 9, 29)
 
-# Fetch BTC kline
-resp1 = requests.get(f"{base}/api/v1/crypto/kline",
+# Fetch BTC kline (Binance spot USDT — deepest liquidity for major pairs)
+resp1 = requests.get(f"{base}/api/v1/crypto/binance/spot/usdt/kline",
     params={"symbol": "BTC", "start_time": start, "end_time": end, "interval": "1d", "limit": 40},
     headers={"X-API-Key": key})
 btc_data = resp1.json()["data"]
@@ -146,7 +148,8 @@ resp2 = requests.get(f"{base}/api/v1/stocks/kline",
 tlt_data = resp2.json()["data"]
 
 # Build date -> close maps
-btc_prices = {c["time_period_start"][:10]: c["price_close"] for c in btc_data}
+# Crypto kline returns time_open as RFC 3339 string; stocks/kline returns time_period_start
+btc_prices = {c["time_open"][:10]: c["price_close"] for c in btc_data}
 tlt_prices = {c["time_period_start"][:10]: c["price_close"] for c in tlt_data}
 
 # Common dates only (align on trading days)

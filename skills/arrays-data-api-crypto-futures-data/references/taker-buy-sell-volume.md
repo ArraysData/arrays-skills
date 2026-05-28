@@ -2,17 +2,18 @@
 
 `GET /api/v1/crypto/taker-buy-sell-volume`
 
-**CRITICAL**: `buy_vol` and `sell_vol` are in **base asset quantity** (e.g., ETH for ETHUSDT), NOT USD. To get USD volume, multiply by the token price from the `crypto/kline` endpoint.
+**CRITICAL**: `buy_vol` and `sell_vol` are in **base asset quantity** (e.g., ETH for ETHUSDT), NOT USD. To get USD volume, multiply by the token price from `crypto/binance/perp/usdt/kline` (the perp kline endpoint in this same skill).
 
-**WARNING — DO NOT use this endpoint for "futures trading volume" queries.** This endpoint only provides taker buy/sell breakdown (in base asset, not USD). For total futures trading volume, you MUST use the `crypto/futures/ohlcv` endpoint instead — it returns `volume_traded` directly in **quote currency (USDT)** with no conversion needed. Call it like this:
+**WARNING — DO NOT use this endpoint for "futures trading volume" queries.** This endpoint only provides taker buy/sell breakdown (in base asset, not USD). For total futures trading volume, use `crypto/binance/perp/usdt/kline` (also in this skill) — its `volume` field is in **base-asset units** (e.g. ETH for ETHUSDT); multiply by a representative bar price (e.g. `price_close`) to get USDT notional. Call it like this:
 ```python
-resp = requests.get(f"{base}/api/v1/crypto/futures/ohlcv",
-    params={"symbol": "ETHUSDT", "start_time": start, "end_time": end, "interval": "1d", "limit": 5},
+resp = requests.get(f"{base}/api/v1/crypto/binance/perp/usdt/kline",
+    params={"symbol": "ETH", "start_time": start, "end_time": end, "interval": "1d", "limit": 5},
     headers={"X-API-Key": key})
 body = resp.json()
-# Data is reverse chronological — use data[-1] for the target date
-target = [d for d in body["data"] if d["time_period_start"].startswith("2025-09-06")]
-volume_usd = target[0]["volume_traded"] if target else body["data"][-1]["volume_traded"]
+# Binance returns reverse chronological — match by date prefix on time_open (RFC 3339 string)
+target = [d for d in body["data"] if d["time_open"].startswith("2025-09-06")]
+bar = target[0] if target else body["data"][-1]
+volume_usd = bar["volume"] * bar["price_close"]   # base × price = USDT notional
 ```
 
 ```json

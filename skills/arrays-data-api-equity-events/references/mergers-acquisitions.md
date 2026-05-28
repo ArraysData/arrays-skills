@@ -8,8 +8,8 @@ Mergers and acquisitions events filtered by date range and/or symbol.
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `from` | string | No | Start date (YYYY-MM-DD, e.g., 2023-08-10) |
-| `to` | string | No | End date (YYYY-MM-DD, e.g., 2023-08-11) |
+| `start_time` | integer | No | Start time (Unix timestamp in seconds) |
+| `end_time` | integer | No | End time (Unix timestamp in seconds) |
 | `symbol` | string | No | Stock symbol (e.g., AAPL, RIO, WLKP) |
 
 **Response fields** (wrapper has `count` + `data[]`; each object in `data[]`)
