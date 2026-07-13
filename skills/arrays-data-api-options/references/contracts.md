@@ -4,6 +4,8 @@
 
 Get options contract specifications and metadata. Returns standardized contract details such as exercise style, expiration dates, strike prices, and shares per contract.
 
+Covers both active and **expired** contracts (the full historical chain). By default only active contracts are returned — set `is_expired=true` for expired only, or `is_expired=all` for both.
+
 ## Parameters
 
 | Param | Type | Required | Description |

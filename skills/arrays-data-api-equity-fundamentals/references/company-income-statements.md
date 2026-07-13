@@ -32,24 +32,17 @@ Each item in the `data` array:
 | `cost_of_revenue` | float64 | Cost of revenue |
 | `gross_profit` | float64 | Gross profit |
 | `gross_profit_ratio` | float64 | Gross profit ratio |
-| `research_and_development_expenses` | float64 | R&D expenses |
-| `selling_general_and_administrative_expenses` | float64 | SG&A expenses |
-| `selling_and_marketing_expenses` | float64 | Selling and marketing expenses |
-| `general_and_administrative_expenses` | float64 | General and administrative expenses |
 | `operating_expenses` | float64 | Total operating expenses |
 | `cost_and_expenses` | float64 | Total cost and expenses |
 | `interest_income` | float64 | Interest income |
 | `interest_expense` | float64 | Interest expense |
 | `depreciation_and_amortization` | float64 | Depreciation and amortization |
 | `ebitda` | float64 | EBITDA |
-| `ebitda_ratio` | float64 | EBITDA ratio |
 | `operating_income` | float64 | Operating income |
 | `operating_profit_ratio` | float64 | Operating profit ratio |
 | `income_before_tax` | float64 | Income before tax |
 | `income_tax_expense` | float64 | Income tax expense |
 | `net_income` | float64 | Net income |
-| `net_income_from_continuing_operations` | float64 | Net income from continuing operations |
-| `net_income_from_discontinued_operations` | float64 | Net income from discontinued operations |
 | `net_income_deductions` | float64 | Net income deductions |
 | `ebit` | float64 | EBIT (earnings before interest and taxes) |
 | `net_interest_income` | float64 | Net interest income |

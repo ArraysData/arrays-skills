@@ -95,7 +95,6 @@ Each element in `data` array:
 | `amount` | string | Shares transacted (negative = sale, positive = purchase) |
 | `price` | string | Transaction price per share |
 | `transactions` | integer | Number of transactions |
-| `sector` | string | Company sector |
 | `filing_date` | string | SEC filing date |
 | `transaction_date` | string | Transaction date |
 | `observed_at` | int64 | Observed timestamp (Unix seconds) |
@@ -109,6 +108,4 @@ Each element in `data` array:
 | `shares_owned_after` | string | Shares owned after transaction |
 | `shares_owned_before` | string | Shares owned before transaction |
 | `officer_title` | string | Officer title (empty if not officer) |
-| `market_cap` | string | Company market cap at time of trade |
 | `is_sp500` | boolean | Whether company is in S&P 500 |
-| `stock_price` | string | Stock price at time of trade |

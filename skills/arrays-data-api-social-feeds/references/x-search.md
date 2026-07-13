@@ -1,12 +1,21 @@
-# X — Posts by handle
+# X — Full-text search
 
-`GET /api/v1/social-feeds/x/by-handle`
+`GET /api/v1/social-feeds/x/search`
 
-Paginated list of posts from the given X/Twitter handle, sorted by `published_at` DESC. Unknown handles trigger an on-demand lookup; the first page (most recent posts) is returned synchronously and the handle is added to tracking immediately, entering the incremental refresh lane (new posts going forward). Historical backfill is NOT automatic — a freshly-discovered handle returns only recent posts; older history is not guaranteed and must be requested separately.
+Elasticsearch full-text search (BM25 over `full_text` with multilingual analyzers) over the tracked-handle registry index — **not** a live X/Twitter search. For a handle that isn't in the registry yet, call `by-handle` first to ingest it.
+
+**Sort order depends on `q`:**
+- `q` present → results are BM25-ranked by relevance.
+- `q` omitted → results are reverse-chronological (`published_at` DESC) within the time window.
+
+**Anti-scrape rule:** when both `q` and `handle` are empty, `since` is capped to the last 30 days (and defaults to 30d if omitted). Passing either `q` or `handle` lifts that cap.
+
+All filters (`q`, `handle`, `since`, `until`, `content_type`, `has_media`) are optional and compose, so the endpoint also works as a pure structured filter (e.g. all `original` posts from a handle in a time window).
 
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
-| `twitter_handle` | string | yes | Twitter handle (no `@`, case-insensitive) |
+| `q` | string | no | Search query (BM25 over `full_text`). Tokens like `#tag` route to a hashtag filter clause and `@user` routes to an author filter clause. Omit for reverse-chronological listing (subject to the 30-day window cap above) |
+| `handle` | string | no | Restrict to a single handle (no `@`, case-insensitive) |
 | `since` | int64 | no | Start time (Unix seconds). Filter to posts at/after this time |
 | `until` | int64 | no | End time (Unix seconds). Filter to posts at/before this time |
 | `content_type` | array | no | Filter by content type. Values: `original`, `reply`, `retweet`, `quote`. Repeat the query param to pass multiple |
@@ -16,7 +25,7 @@ Paginated list of posts from the given X/Twitter handle, sorted by `published_at
 
 #### Response fields
 
-Each item in the `data` array:
+Each item in the `data` array follows the same per-post shape as `by-handle`:
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -29,7 +38,7 @@ Each item in the `data` array:
 | `display_name` | string | Author's display name |
 | `full_text` | string | Post text |
 | `content_type` | string | `original`, `reply`, `retweet`, or `quote` |
-| `meta_json` | string | Stringified JSON: full X API metadata (`author_id`, `conversation_id`, `public_metrics`, `retweeted_post_id`, etc.). Parse with `JSON.parse` |
+| `meta_json` | string | Stringified JSON: full X API metadata (`author_id`, `conversation_id`, `public_metrics`, `retweeted_post_id` or `quoted_post_id`, etc.). Parse with `JSON.parse` |
 | `media_json` | string | Stringified JSON array of attached media |
 | `like_count` | int64 | Likes. Omitted when unknown; genuine `0` is included |
 | `retweet_count` | int64 | Retweets. Omitted when unknown; genuine `0` is included |

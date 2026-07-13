@@ -2,7 +2,9 @@
 
 `GET /api/v1/stocks/ipo-calendar`
 
-Upcoming IPO schedules with company details, expected pricing, and market information.
+Forward-looking IPO schedule from an upstream market-data vendor, with company details, expected pricing, and market information. Suitable for tracking *planned* IPO events.
+
+**Not authoritative for historical IPOs**: this is a live passthrough of the vendor's planning calendar. To confirm whether a past listing actually happened (or to look up SEC filings for a known company), use `ipo-confirmed-calendar` or check historical prices/company profiles via the respective market data/fundamentals skills instead.
 
 **Request parameters**
 
@@ -20,7 +22,7 @@ Upcoming IPO schedules with company details, expected pricing, and market inform
 | `daa` | string | IPO date-time (ISO 8601) |
 | `company` | string | Company name |
 | `exchange` | string | Exchange (e.g., "NYSE") |
-| `actions` | string | Status (e.g., "Expected") |
+| `actions` | string | Upstream-provided status. Common values include `Expected`, `Priced`, `Withdrawn`. **Not reliable for historical entries** — ETF, OTC, and SPAC listings frequently remain `Expected` long after they have actually listed (e.g., spot Bitcoin ETFs like IBIT/FBTC/ARKB still show `Expected` for their 2024-01 launch). Treat `Expected` on a past `date` as "unknown", not "did not list". |
 | `shares` | integer | Number of shares offered (may be null) |
 | `price_range` | string | Expected price range (may be null) |
 | `market_cap` | string | Expected market cap (may be null) |

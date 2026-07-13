@@ -6,18 +6,19 @@ Skill definitions for [Arrays](https://arrays.org/), which is a unified data eng
 
 | Directory | Contents |
 |-----------|----------|
-| `skills/` | 17 domain skills. Each skill is a `SKILL.md` describing API endpoints, parameters, and usage patterns. |
+| `skills/` | 19 domain skills. Each skill is a `SKILL.md` describing API endpoints, parameters, and usage patterns. |
 | `templates/` | Shared templates for authentication and response formatting. |
 
 <details>
-<summary>All 17 skills</summary>
+<summary>All 19 skills</summary>
 
 | Skill | Description |
 |-------|-------------|
 | `arrays-data-api-company-crypto-holdings` | Corporate crypto holdings and transactions |
+| `arrays-data-api-crypto-analytics-passthrough` | On-chain analytics passthrough — ~245 upstream endpoints (network data, miner/entity flows, DEX/AMM) |
 | `arrays-data-api-crypto-exchange-flow` | Exchange inflow/outflow (hourly/daily) |
 | `arrays-data-api-crypto-futures-data` | Funding rates, open interest, long-short ratios, perp kline |
-| `arrays-data-api-crypto-metrics-and-screener` | On-chain metrics, DeFi pools, fear-greed index, token screening |
+| `arrays-data-api-crypto-metrics-and-screener` | On-chain metrics, fear-greed index, token unlocks, token screening |
 | `arrays-data-api-equity-estimates-and-targets` | Analyst estimates, price targets, earnings guidance |
 | `arrays-data-api-equity-events` | Dividends, splits, earnings calendar, transcripts, SEC filings, IPO, M&A |
 | `arrays-data-api-equity-fundamentals` | Company financials, KPIs, executive info |
@@ -27,6 +28,7 @@ Skill definitions for [Arrays](https://arrays.org/), which is a unified data eng
 | `arrays-data-api-news` | Market news |
 | `arrays-data-api-options` | Options chain, greeks, open interest |
 | `arrays-data-api-polymarket` | Polymarket prediction markets and pricing |
+| `arrays-data-api-semiconductor-price` | DRAM/NAND Flash spot & contract prices, memory cards, DXI index |
 | `arrays-data-api-social-feeds` | Per-handle X/Twitter feeds by handle or URL, handle entities |
 | `arrays-data-api-spot-market-price-and-volume` | Stock/crypto kline, OHLCV, market cap |
 | `arrays-data-api-stock-metrics` | Market cap, darkpool data, analyst ratings, market/technical metrics |

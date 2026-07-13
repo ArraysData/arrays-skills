@@ -1,6 +1,6 @@
 ---
 name: arrays-data-api-equity-fundamentals
-description: Calls Arrays REST APIs for equity fundamentals — company profiles, executive compensation (salary, bonus, stock awards), income/balance/cashflow statements, shares float, outstanding shares, fiscal dates, and KPI. Use when the user asks about company details, executive pay, quarterly/annual financial statements, or earnings filings. Do NOT use for financial metrics (revenue TTM, net income TTM, EPS TTM, ROE, ROA, ROIC, margins, debt ratios, current/quick ratio) or market-level technical indicators (moving averages, EMA, RSI, MACD, Bollinger, VWAP, beta, volatility, PE ratio, PB ratio, PS ratio, dividend yield, enterprise value, EV/EBITDA, price changes) — those MUST use arrays-data-api-stock-metrics.
+description: Calls Arrays REST APIs for equity fundamentals — company profiles (US and non-US listings such as `0700.HK`, `9988.HK`, `000660.KS`), executive compensation (salary, bonus, stock awards), income/balance/cashflow statements, shares float, outstanding shares, fiscal dates, and KPI. Use when the user asks about company details (US or non-US), executive pay, quarterly/annual financial statements, or earnings filings. Do NOT use for financial metrics (revenue TTM, net income TTM, EPS TTM, ROE, ROA, ROIC, margins, debt ratios, current/quick ratio) or market-level technical indicators (moving averages, EMA, RSI, MACD, Bollinger, VWAP, beta, volatility, PE ratio, PB ratio, PS ratio, dividend yield, enterprise value, EV/EBITDA, price changes) — those MUST use arrays-data-api-stock-metrics.
 ---
 
 
@@ -19,7 +19,8 @@ Company profiles, financial statements, shares float, outstanding shares, fiscal
 
 | Method | Path | File | Description |
 |--------|------|------|-------------|
-| GET | `company/detail` | `company-detail` | Company detail |
+| GET | `company/detail` | `company-detail` | Company detail (US tickers, e.g. `AAPL`) |
+| GET | `non-us/company/detail` | `company-detail-non-us` | Company detail for non-US tickers (dotted-suffix form, e.g. `0700.HK`, `000660.KS`) — separate response schema; **curated symbol subset** (selected non-US listings only) |
 | GET | `company/income-statements` | `company-income-statements` | Financial statements |
 | GET | `company/balance-sheets` | `company-balance-sheets` | Financial statements |
 | GET | `company/cashflow-statements` | `company-cashflow-statements` | Financial statements |
@@ -98,13 +99,21 @@ for k in kpis:
     for m in k["metrics"]:
         print(f"{m['name']}: {m['value']}")
 
-# Company detail
+# Company detail (US)
 resp = requests.get(f"{base}/api/v1/stocks/company/detail",
     params={"symbol": "AAPL"},
     headers={"X-API-Key": key})
 body = resp.json()
 company = body["data"]  # array
 print(f"Name: {company[0]['name']}, Sector: {company[0]['sector']}")
+
+# Company detail (non-US) — note the different path and response field names
+resp = requests.get(f"{base}/api/v1/stocks/non-us/company/detail",
+    params={"symbol": "0700.HK"},
+    headers={"X-API-Key": key})
+body = resp.json()
+profile = body["data"][0]  # uses `company_name` / `currency`, not `name`
+print(f"{profile['company_name']} on {profile['exchange_full_name']} ({profile['currency']})")
 
 # Executives info
 resp = requests.get(f"{base}/api/v1/stocks/company/executives",

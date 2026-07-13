@@ -7,6 +7,7 @@ Four separate endpoints, each filtering by a different dimension. The query para
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
 | `country` | string | yes | ISO 3166-1 alpha-2 country code |
+| `symbol_type` | string | no | Asset type: `stock` (non-ETF) or `etf`. Default `stock`. |
 
 Accepted values (57): `AE`, `AR`, `AU`, `BE`, `BM`, `BR`, `BS`, `CA`, `CH`, `CI`, `CL`, `CN`, `CO`, `CR`, `CY`, `DE`, `DK`, `ES`, `FI`, `FR`, `GB`, `GG`, `GI`, `GR`, `HK`, `ID`, `IE`, `IL`, `IN`, `IS`, `IT`, `JE`, `JO`, `JP`, `KR`, `KY`, `KZ`, `LU`, `MC`, `MO`, `MX`, `MY`, `NL`, `NO`, `PA`, `PE`, `PH`, `SE`, `SG`, `TH`, `TR`, `TW`, `US`, `UY`, `VG`, `VN`, `ZA`
 
@@ -15,8 +16,9 @@ Accepted values (57): `AE`, `AR`, `AU`, `BE`, `BM`, `BR`, `BS`, `CA`, `CH`, `CI`
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
 | `exchange` | string | yes | Exchange name |
+| `symbol_type` | string | no | Asset type: `stock` (non-ETF) or `etf`. Default `stock`. |
 
-Accepted values: `AMEX`, `NASDAQ`, `NYSE`
+Accepted values: `AMEX`, `NASDAQ`, `NYSE` (3 listing buckets). ETFs are included when `symbol_type=etf` — the `AMEX` bucket in particular is dominated by NYSE Arca-listed ETFs (Arca is folded into `AMEX`).
 
 ### `GET /api/v1/stocks/screener/basic-info/sector?sector={name}`
 

@@ -22,6 +22,6 @@ Each object in the `data` array:
 | `shares_number` | int64 | Number of shares held |
 | `weight_percentage` | float64 | Percentage weight of this holding in the portfolio |
 | `market_value` | float64 | Total market value of the holding |
-| `updated_at` | string | Last update timestamp |
+| `updated_at` | string | Snapshot as-of / refresh time, RFC3339 with `Z` (e.g. `2026-06-24T03:06:07Z`) |
 
 ---

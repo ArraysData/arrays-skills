@@ -2,6 +2,8 @@
 
 `GET /api/v1/stocks/screener/technical-metrics`
 
+Covers US-listed stocks and ETFs (`symbol_type`) across NYSE, NASDAQ, NYSE American, NYSE Arca, and Cboe BZX (XNYS/XNAS/XASE/ARCX/BATS), with no size/liquidity floor — rankings include illiquid names. Filter with a `DOLLAR_VOLUME` range (works for both); for stocks you can also use `MARKET_CAP` (via `financial-metrics`). Each call filters only the queried metric.
+
 ## Parameters
 
 | Param | Type | Required | Description |
@@ -11,6 +13,7 @@
 | `range_min` | float64 | no | Min value filter — returns stocks with value ≥ `range_min` |
 | `range_max` | float64 | no | Max value filter — returns stocks with value ≤ `range_max` |
 | `order_by` | string | no | Sort by metric value: `ASC` or `DESC` (default `DESC`) |
+| `symbol_type` | string | no | Asset type filter: `stock` (CS/ADRC) or `etf`. Default `stock`. |
 
 **Technical metric types:**
 

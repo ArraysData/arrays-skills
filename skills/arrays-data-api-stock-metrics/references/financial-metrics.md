@@ -2,6 +2,8 @@
 
 `GET /api/v1/stocks/financial-metrics`
 
+Covers US-listed stocks on NYSE, NASDAQ, and NYSE American (XNYS/XNAS/XASE); ETFs are not covered (these are company fundamentals). OTC is excluded.
+
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
 | `metric` | string | yes | Metric type (see list below) |

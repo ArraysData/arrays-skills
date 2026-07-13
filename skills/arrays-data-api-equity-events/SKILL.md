@@ -25,6 +25,11 @@ Access in Python: `body["data"]`
 
 - **Use wide time windows**: When querying dividends or splits for a specific date, **ALWAYS** use a broad time range (at least +/- 90 days around the target date). A 1-day or even 7-day window will often return ZERO results because the API's internal timestamps don't align exactly with the event date. Always query a wide window and filter results client-side by matching the `date` field.
 - **Dividend date types**: The `date` field is the ex-dividend date. `record_date` is the record date. `payment_date` is the payment date. These can differ by weeks (e.g., ex-date Mar 5 vs payment date Mar 27). When a user asks about a dividend "on" a specific date, check ALL date fields (`date`, `record_date`, `payment_date`) against that date since the user might be referring to any of them.
+- **IPO events** — coverage gaps to know about:
+ipo-calendar includes forward-looking schedules. The actions field doesn't reliably flip to "listed" after a completed listing — if an IPO shows "Expected" on a past date, treat it as unknown, not as evidence of failure to list.
+ipo-confirmed-calendar is SEC registration filings (currently all CERT). It's a reasonable proxy for "this company is going public soon" but not "this company has IPO'd." Coverage starts 2025-01-01.
+- **Fiscal year ≠ calendar year** (`earnings-transcript`, `sec-earnings-release`): these endpoints are keyed by the company's *fiscal* `fiscal_year` + `fiscal_quarter`, not the calendar date. Many fiscal calendars are offset — e.g. Walmart's fiscal year ends in late January, so the quarter it reports in **May 2026** is **FY2027 Q1** (verified: WMT `fiscal_year=2027, fiscal_quarter=Q1` → released 2026-05-21), not "2026 Q2". When the user gives a calendar month/date (e.g. "the May 2026 earnings call"), first map it to the fiscal period before calling these endpoints: call `fiscal-dates/range` in **arrays-data-api-equity-fundamentals** with the calendar date range → it returns the matching `fiscal_year` + `fiscal_quarter`. Never assume fiscal = calendar.
+- **`sec-earnings-release` freshness (lags the public release)**: this endpoint is sourced from SEC 8-K filings, which trail the public earnings release for two groups — **wire filers** (large caps reporting via Business Wire / GlobeNewswire + a call; 8-K ~1 day later) and **IR-only filers** (notably **Berkshire Hathaway BRK-A/BRK-B**; publish on their IR site 2–3 days before the 8-K). When the user wants the **latest** period and this endpoint returns `NOT_FOUND` *after* the scheduled report date (per `earnings-calendar`) has passed, see `references/sec-earnings-release.md` → "Freshness & live fallback when the SEC filing lags" for a labeled, best-effort IR/newswire fallback.
 - **Timestamp computation**: Always use Python `datetime` + `calendar` to compute Unix timestamps.
 ```python
 import calendar
@@ -42,9 +47,8 @@ ts = int(calendar.timegm(datetime(2025, 8, 13, 0, 0, 0, tzinfo=timezone.utc).tim
   - `earnings-transcript` — earnings call transcript (full text, by speaker and section)
   - `sec-earnings-release` — SEC earnings release publication date and filing URL
   - `ipo-calendar` — IPO calendar
-  - `ipo-confirmed-calendar` — confirmed IPO calendar
+  - `ipo-confirmed-calendar` — SEC registration filings (currently all CERT, coverage starts 2025-01-01)
   - `mergers-acquisitions` — M&A events
-
   - `equity-offering` — equity/fundraising offerings
   - `crowdfunding/offerings` — crowdfunding offerings
 
@@ -58,9 +62,8 @@ ts = int(calendar.timegm(datetime(2025, 8, 13, 0, 0, 0, tzinfo=timezone.utc).tim
 | GET | `earnings-transcript` | `earnings-transcript` | Earnings Transcript |
 | GET | `sec-earnings-release` | `sec-earnings-release` | Sec Earnings Release |
 | GET | `ipo-calendar` | `ipo-calendar` | Ipo Calendar |
-| GET | `ipo-confirmed-calendar` | `ipo-confirmed-calendar` | Ipo Confirmed Calendar |
+| GET | `ipo-confirmed-calendar` | `ipo-confirmed-calendar` | SEC registration filings (currently all CERT, coverage starts 2025-01-01) |
 | GET | `mergers-acquisitions` | `mergers-acquisitions` | Mergers Acquisitions |
-
 | GET | `equity-offering` | `equity-offering` | Equity Offering |
 | GET | `crowdfunding/offerings` | `crowdfunding-offerings` | Crowdfunding — Offerings |
 
@@ -98,13 +101,16 @@ for s in body["data"]:
     if s["date"] == "2020-08-31":
         print(f"{int(s['numerator'])}-for-{int(s['denominator'])} split")
 
-# Earnings calendar — use body["data"]
+# Earnings calendar — event dates only (no financial figures).
+# For actual EPS/revenue use arrays-data-api-equity-fundamentals
+# (company/income-statements); for estimates use
+# arrays-data-api-equity-estimates-and-targets (estimates-guidance).
 resp = requests.get(f"{base}/api/v1/stocks/earnings-calendar",
     params={"symbol": "AAPL", "start_time": 1735689600, "end_time": 1751241600},
     headers={"X-API-Key": key})
 body = resp.json()
 for e in body["data"]:
-    print(f"{e['date']}: EPS={e['eps']}, Revenue={e['revenue']}")
+    print(f"{e['date']} ({e['time']}): reports for fiscal period ending {e['fiscal_date_ending']}")
 
 # Earnings transcript — use body["data"]
 resp = requests.get(f"{base}/api/v1/stocks/earnings-transcript",

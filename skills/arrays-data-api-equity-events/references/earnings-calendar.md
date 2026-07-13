@@ -6,6 +6,10 @@ Earnings calendar data with optional filtering by symbol and/or date range.
 
 **No historical data**: `earnings-calendar` only covers upcoming/recent earnings. Past earnings entries are replaced once the actual report is filed. For historical earnings filings, use `arrays-data-api-equity-fundamentals`.
 
+**Use this endpoint for event dates only — not financial figures.** `earnings-calendar` reports *when* a company reports, not the reported numbers. For actual or estimated EPS and revenue, go to the financials/estimates endpoints, which are the authoritative, consistently-scoped source:
+- **Actual EPS / revenue** → `arrays-data-api-equity-fundamentals` (`company/income-statements`: `eps`, `eps_diluted`, `revenue`).
+- **Estimated EPS / revenue** → `arrays-data-api-equity-estimates-and-targets` (`estimates-guidance` with `metrics=EPS,SALES` — analyst consensus).
+
 **Request parameters**
 
 | Name | Type | Required | Description |
@@ -21,11 +25,7 @@ Earnings calendar data with optional filtering by symbol and/or date range.
 | `id` | integer | Unique identifier |
 | `symbol` | string | Stock symbol |
 | `date` | string | Earnings date (YYYY-MM-DD) |
-| `eps` | string | Actual earnings per share |
-| `eps_estimated` | string | Estimated earnings per share |
 | `time` | string | Earnings call time (e.g., "amc", "bmo") |
-| `revenue` | string | Actual revenue |
-| `revenue_estimated` | string | Estimated revenue |
 | `fiscal_date_ending` | string | Fiscal period end date |
 | `updated_from_date` | string | Date the data was updated from |
 | `created_at` | string | Record creation timestamp |

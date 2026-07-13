@@ -26,7 +26,7 @@
 | Field | Type | Description |
 |-------|------|-------------|
 | `symbol` | string | Stock symbol |
-| `fsym_id` | string | FactSet symbol ID |
+| `fsym_id` | string | Vendor symbol ID |
 | `metric` | string | Metric name (e.g., EPS, SALES, EBITDA) |
 | `periodicity` | string | Period type: `annual`, `quarterly`, or `semi-annual` |
 | `fiscal_period` | string | Fiscal period: `Q1`, `Q2`, `Q3`, `Q4` |
@@ -48,7 +48,7 @@
 | Field | Type | Description |
 |-------|------|-------------|
 | `symbol` | string | Stock symbol |
-| `fsym_id` | string | FactSet symbol ID |
+| `fsym_id` | string | Vendor symbol ID |
 | `metric` | string | Metric name (e.g., EPS, SALES, EBITDA) |
 | `periodicity` | string | Period type: `annual`, `quarterly`, or `semi-annual` |
 | `fiscal_period` | string | Fiscal period: `Q1`, `Q2`, `Q3`, `Q4` |

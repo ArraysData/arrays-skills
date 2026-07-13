@@ -2,7 +2,7 @@
 
 `GET /api/v1/stocks/screener/financial-metrics`
 
-Includes companies with market cap > $5B at the snapshot time (current market caps may have since drifted below this threshold).
+Covers US-listed stocks on NYSE, NASDAQ, and NYSE American (XNYS/XNAS/XASE), with no size/liquidity floor — rankings include microcaps and illiquid names. Add a `MARKET_CAP` range filter (size) or a `DOLLAR_VOLUME` screen via `technical-metrics` (liquidity); each call filters only the queried metric.
 
 ## Parameters
 

@@ -15,6 +15,7 @@ Same filtering as `screener/technical-metrics` but over a date range. Results ar
 | `range_max` | float64 | no | Max value filter — returns stocks with value ≤ `range_max` |
 | `order_by` | string | no | Sort by metric value within each day: `ASC` or `DESC` (default `DESC`) |
 | `limit` | integer | no | Max results per day (default no limit) |
+| `symbol_type` | string | no | Asset type filter: `stock` (CS/ADRC) or `etf`. Default `stock`. |
 
 ## Response
 

@@ -2,6 +2,8 @@
 
 `GET /api/v1/crypto/screener/metrics`
 
+Rank and filter crypto tokens by a single metric at a daily snapshot. Underlying price & volume are from Binance spot markets, so symbols are Binance USDT pairs (e.g. `BTCUSDT`).
+
 **Request parameters**
 
 | Param | Type | Required | Description |
@@ -20,7 +22,7 @@ Each item in `data`:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `symbol` | string | Token symbol (e.g. `"BTC"`) |
+| `symbol` | string | Binance USDT trading pair (e.g. `"BTCUSDT"`) |
 | `snapshot_time` | int64 | Snapshot time in Unix seconds |
 | `date` | string | Date string (`YYYY-MM-DD`) |
 | `metric` | string | Metric type identifier (e.g. `"MARKET_CAP"`) |

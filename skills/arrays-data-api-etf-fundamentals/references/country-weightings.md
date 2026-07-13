@@ -16,5 +16,6 @@ Each object in the `data` array:
 |-------|------|-------------|
 | `country` | string | Country name (e.g., "United States") |
 | `weight_percentage` | string | Percentage weight as a string (e.g., "99.56%") |
+| `updated_at` | string | Snapshot as-of / refresh time, RFC3339 with `Z` (e.g. `2026-06-24T03:06:07Z`) |
 
 ---

@@ -23,3 +23,4 @@ Supported tokens: `BTC`, `ETH`, `SOL`, `BNB` (case insensitive). Not supported: 
 | `company_name` | string | Company name |
 | `country` | string | Company country |
 | `token_holdings` | object | Detailed token holdings, e.g. `{ "BTC": { "amount": 214246 } }` |
+| `updated_at` | string | Snapshot as-of / refresh time, RFC3339 with `Z` (e.g. `2026-06-24T03:06:07Z`) |
