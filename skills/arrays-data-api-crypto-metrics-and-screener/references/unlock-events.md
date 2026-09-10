@@ -12,7 +12,7 @@
 
 Both dates must fall inside the available window. An out-of-range date returns `INVALID_PARAMETER`; use the accepted range reported in the error message.
 
-> **Sort order:** ⚠️ **no ordering guarantee** — events are passed through in the upstream vendor's order (arrays-core applies no `ORDER BY`). Sort by the unlock date yourself before taking "next" / "upcoming" / "latest".
+> **Sort order:** ⚠️ **no ordering guarantee** — events are passed through in the upstream vendor's order (the API applies no `ORDER BY`). Sort by the unlock date yourself before taking "next" / "upcoming" / "latest".
 
 **Response envelope:** `{ "success": true, "request_id": "...", "data": [ ... ] }`
 
