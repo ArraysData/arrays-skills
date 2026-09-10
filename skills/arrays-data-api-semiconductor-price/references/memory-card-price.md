@@ -13,7 +13,7 @@ Use a lookback window of at least 2–3 weeks when fetching the "latest" price.
 
 ## Response
 
-Flat wrapper: rows are under `data` (not `response.data`). Sort by `date` yourself — ordering is not guaranteed.
+Flat wrapper: rows are under `data` (not `response.data`). Rows are returned in ascending `date` order (oldest first) — note this is the opposite default of the macro historical endpoints, which are newest-first.
 
 ```json
 {
@@ -53,7 +53,7 @@ Flat wrapper: rows are under `data` (not `response.data`). Sort by `date` yourse
 import requests, os, calendar
 from datetime import datetime, timezone
 
-base = os.environ.get("ARRAYS_API_BASE_URL", "https://data-tools.prd.space.id")
+base = os.environ.get("ARRAYS_API_BASE_URL", "https://data-tools.prd.arrays.org")
 
 def to_ts(y, m, d):  # Unix seconds, UTC — do NOT use datetime.timestamp()
     return calendar.timegm(datetime(y, m, d, tzinfo=timezone.utc).timetuple())
@@ -63,7 +63,7 @@ resp = requests.get(f"{base}/api/v1/other/semiconductor/memory-card-price",
             "start_time": to_ts(2025, 1, 1), "end_time": to_ts(2025, 3, 1)},
     headers={"X-API-Key": os.environ["ARRAYS_API_KEY"]})
 body = resp.json()
-data = sorted(body["data"], key=lambda r: r["date"])  # flat wrapper; don't trust ordering
+data = sorted(body["data"], key=lambda r: r["date"])  # flat wrapper; rows come ascending by date (sorting defensively is harmless)
 for row in data:  # weekly → ~4-5 rows per month, not ~20
     print(f"{row['date']}: high={row['high']}, low={row['low']}, avg={row['avg']}")
 ```

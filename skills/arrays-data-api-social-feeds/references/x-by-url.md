@@ -34,8 +34,8 @@ Each item in the `data` array:
 | `bookmark_count` | int64 | Bookmarks. Omitted when unknown; genuine `0` is included |
 | `conversation_id` | string | X conversation thread. May be absent |
 | `in_reply_to_user_id` | string | If a reply, the user ID being replied to. May be absent |
-| `referenced_tweets` | array | One entry per referenced tweet. Each item: `{id, type, author_external_id?}` where `type` is `replied_to` / `retweeted` / `quoted`, and `author_external_id` is the referenced author's X numeric user ID when known (empty on legacy rows pre-backfill). May be absent on sparsely-observed posts |
-| `source` | object | **Nested source tweet** for `retweet` / `quote` / `reply` posts — a tweet object with `twitter_handle` / `display_name` / `full_text` / counters / `media`. Omitted when `content_type` is `original` or when the source can't be hydrated |
+| `referenced_tweets` | array | One entry per referenced tweet. Each item: `{id, type, author_external_id?, text?, published_at?, author_handle?, author_display_name?}` where `type` is `replied_to` / `retweeted` / `quoted`; `author_external_id` is the referenced author's X numeric user ID when known (empty on legacy rows pre-backfill); `text`, `published_at` (RFC 3339) and the author fields are present when the referenced post has been ingested. May be absent on sparsely-observed posts |
+| `source` | object | **Nested source tweet** for `retweet` / `quote` / `reply` posts — a tweet object with `twitter_handle` / `display_name` / `full_text` / counters / `media` (each media item: `type`, `url`, `media_key`, `width`, `height`). Omitted when `content_type` is `original` or when the source can't be hydrated |
 | `mentions` | string[] | Handles mentioned (no `@`). May be absent |
 | `entity_mentions.people` | array | Linked person entities |
 | `entity_mentions.tickers` | array | Linked ticker entities |

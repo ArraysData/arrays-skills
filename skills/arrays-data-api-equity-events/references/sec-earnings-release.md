@@ -13,7 +13,7 @@ The underlying filing is an **8-K** for US domestic issuers and a **6-K** for fo
 | `symbol` | string | Yes | Stock symbol (e.g., AAPL, IBM) |
 | `period_type` | string | Yes | `annual` or `quarterly`. `period_type=annual` returns the full-year earnings release as a single row with `quarter` = `YYYY00` (e.g. `202400` = FY2024 annual). This is the same underlying filing (8-K, or 6-K for foreign private issuers) as that fiscal year's Q4. Treat the annual release as the Q4 filing, not a separate event.|
 | `fiscal_year` | integer | Yes | Fiscal year (≥ ~2005; e.g., 2024). Older fiscal years return a `NOT_FOUND` error rather than an empty `data` array. |
-| `fiscal_quarter` | string | No | Fiscal quarter: `Q1`, `Q2`, `Q3`, `Q4` — required when period_type is `quarterly` |
+| `fiscal_quarter` | string | No | Fiscal quarter: `Q1`, `Q2`, `Q3`, `Q4`, or `FY` — required when period_type is `quarterly`; `FY` is accepted with `period_type=annual` |
 
 **Response fields** (each object in `data[]`)
 

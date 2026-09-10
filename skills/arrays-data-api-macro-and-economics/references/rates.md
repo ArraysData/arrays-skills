@@ -15,6 +15,8 @@
 ```
 Access in Python: `body["data"]`
 
+> **Sort order:** `data` is sorted **descending** by `date` (newest first). Sort it yourself if your code expects oldest-first / chronological order.
+
 **Python example:**
 ```python
 import requests, os, calendar

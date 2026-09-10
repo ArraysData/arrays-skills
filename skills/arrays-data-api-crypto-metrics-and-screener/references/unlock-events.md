@@ -10,14 +10,11 @@
 | `start` | string | no | Start date (`YYYY-MM-DD`) |
 | `end` | string | no | End date (`YYYY-MM-DD`) |
 
-**Response fields** — the top-level response body contains:
+Both dates must fall inside the available window. An out-of-range date returns `INVALID_PARAMETER`; use the accepted range reported in the error message.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `metadata` | object | Query metadata |
-| `metadata.query_date` | string | ISO 8601 date of the query |
-| `status` | boolean | API status |
-| `data` | array | Array of unlock event objects |
+> **Sort order:** ⚠️ **no ordering guarantee** — events are passed through in the upstream vendor's order (arrays-core applies no `ORDER BY`). Sort by the unlock date yourself before taking "next" / "upcoming" / "latest".
+
+**Response envelope:** `{ "success": true, "request_id": "...", "data": [ ... ] }`
 
 Each item in `data`:
 

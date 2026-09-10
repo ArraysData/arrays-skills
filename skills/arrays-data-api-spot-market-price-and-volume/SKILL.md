@@ -1,27 +1,28 @@
 ---
 name: arrays-data-api-spot-market-price-and-volume
-description: Calls Arrays REST APIs for spot market prices and volume — US and non-US stock kline plus crypto spot price/volume/candlestick/kline/OHLCV data on Binance (spot USDT) and Hyperliquid (spot USDC). Use when the user asks for raw spot price/volume/OHLCV/candlestick/kline data, Binance or Hyperliquid spot prices, HYPE candles, or non-US stock daily bars for dotted-suffix tickers like `0700.HK`, `9988.HK`, or `000660.KS`. For perpetual futures kline / volume / funding rate / open interest / long-short ratio / taker buy-sell volume / HIP-3 tokenized equities (AAPL, TSLA on Hyperliquid), use arrays-data-api-crypto-futures-data. For token metadata profile (name, category, description, logo, contracts, official URLs) and metrics including market cap, crypto supply, moving averages, EMA, SMA, RSI, MACD, Bollinger Bands, VWAP, beta, volatility, PE ratio, PB ratio, PS ratio, dividend yield, enterprise value, EV/EBITDA, price change percentages (1d/1w/1M/3M/6M/YTD/1Y), use arrays-data-api-stock-metrics for stocks and arrays-data-api-crypto-metrics-and-screener for crypto.
+description: Calls Arrays REST APIs for spot market prices and volume — US and non-US stock kline plus crypto spot price/volume/candlestick/kline/OHLCV data on Binance (spot USDT) and Hyperliquid (spot USDC). Also the unified `market/kline` endpoint, which returns the same OHLCV shape for any listed instrument by `trading_pair` — crypto spot and perps (Binance, Hyperliquid incl. HIP-3), US stocks, ETFs and options, US indices, CME commodity futures and FX — plus `market/trading-pairs` to discover the venues a symbol trades on. Use when the user asks for raw spot price/volume/OHLCV/candlestick/kline data, Binance or Hyperliquid spot prices, HYPE candles, non-US stock kline (daily or intraday) for dotted-suffix tickers like `0700.HK`, `9988.HK`, or `000660.KS`, one kline call across asset classes, or which markets a symbol is listed on. For perpetual futures kline / volume / funding rate / open interest / long-short ratio / taker buy-sell volume / HIP-3 tokenized equities (AAPL, TSLA on Hyperliquid), use arrays-data-api-crypto-futures-data. For token metadata profile (name, category, description, logo, contracts, official URLs) and metrics including market cap, crypto supply, moving averages, EMA, SMA, RSI, MACD, Bollinger Bands, VWAP, beta, volatility, PE ratio, PB ratio, PS ratio, dividend yield, enterprise value, EV/EBITDA, price change percentages (1d/1w/1M/3M/6M/YTD/1Y), use arrays-data-api-stock-metrics for stocks and arrays-data-api-crypto-metrics-and-screener for crypto.
 ---
 
 
 # Arrays Data API — Spot Market Price and Volume
 
-US and non-US stock kline plus crypto spot kline/OHLCV (Binance USDT, Hyperliquid USDC). For token metadata profile by symbol (`crypto/detail`), use arrays-data-api-crypto-metrics-and-screener.
+US and non-US stock kline plus crypto spot kline/OHLCV (Binance USDT, Hyperliquid USDC), and the unified `market/kline` for any instrument by `trading_pair`. For token metadata profile by symbol (`crypto/detail`), use arrays-data-api-crypto-metrics-and-screener.
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
 
 ## Important notes
 
 - **Data ordering**: All kline endpoints return **reverse chronological** (latest first; use `data[0]` or match by timestamp). `stocks/kline` uses `time_period_start`; new crypto endpoints use `time_open`.
-- **Non-US stocks**: `stocks/non-us/kline` is **daily-only** (`1d`), uses dotted-suffix symbols (`0700.HK`, `9988.HK`, `000660.KS`), and prices come back in **local currency** (tagged per-bar via `quote_currency`: `HKD`, `JPY`, `GBP`, …). Bar UTC times track the local exchange session (HKEX morning open is 01:30 UTC, etc.), so daily bars are not midnight-aligned. **Coverage is a curated subset, not every non-US listing** — only a selected list of symbols is backed by data (currently spanning exchanges such as HKEX `.HK`, KRX `.KS`, SIX `.SW`; many exchanges/tickers are not yet included).
+- **Non-US stocks**: `stocks/non-us/kline` supports intervals `1min` `5min` `15min` `30min` `1h` `4h` `1d` `1w` `1m` (intraday rolled up from 1-minute bars), uses dotted-suffix symbols (`0700.HK`, `9988.HK`, `000660.KS`), and prices come back in **local currency** (tagged per-bar via `quote_currency`: `HKD`, `JPY`, `GBp`, …). **Minor-unit venues (`*.L` pence, `*.TA` agorot, `*.JO` cents) return prices in sub-units — divide by 100 for GBP/ILS/ZAR.** Bar UTC times track the local exchange session (HKEX morning open is 01:30 UTC, etc.), so bars are not midnight-aligned. **Coverage is a curated subset, not every non-US listing** — only a selected list of symbols is backed by data (currently spanning exchanges such as HKEX `.HK`, KRX `.KS`, SIX `.SW`; many exchanges/tickers are not yet included).
 - **`volume` unit**: All endpoints return `volume` in **base-asset units** (BTC, ETH, HYPE, shares, etc.) — multiply by a representative bar price for notional. `stocks/kline` uses the legacy field name `volume_traded`.
 - **Quote currency scope**: Binance only via **USDT** pairs; Hyperliquid only via **USDC** pairs. Other quote currencies (Binance `USDC/FDUSD/BTC`, Hyperliquid HIP-3 `USDH/USDE/USDT` etc.) are not exposed by these endpoints.
 - **Timestamp Rule**: Date fields are stored in UTC for crypto data and US Eastern time (ET) for US stocks. A bar is only returned if the query range fully contains `[time_open, time_close]`.
 - **Bar boundaries**: Stock intraday RTH: 9:30–16:00 ET; intraday ETH: 4:00–20:00 ET. `1d`: 9:30–16:00 ET (RTH only). `1w`/`1m`/`3m`: midnight ET. Crypto: midnight UTC.
 - **Session filter**: `session=ETH` is only valid for intraday intervals. Using it with `1d` or higher returns an error.
+- **Unified `market/kline`**: one call shape for every asset class, but a different contract from the endpoints above — `trading_pair` instead of `symbol`, **RFC 3339** `start_time` / `end_time` instead of Unix seconds, and a fixed interval set (`1min` `5min` `15min` `30min` `1h` `4h` `1d` `1w` `1m`). **US stocks and ETFs at `1d` or above require `session=RTH`.** Indices, CME futures and FX are daily only. Non-US dotted symbols are not accepted — use `stocks/non-us/kline`. Prefer the dedicated endpoints when one exists for the asset; reach for `market/kline` when you need perps, options, futures, FX or indices, or one loop over mixed assets.
 
 ## Endpoints
 
@@ -30,7 +31,9 @@ US and non-US stock kline plus crypto spot kline/OHLCV (Binance USDT, Hyperliqui
 | GET | `/api/v1/crypto/binance/spot/usdt/kline` | `binance-spot-usdt-kline` | Binance spot USDT kline (use as default for BTC, ETH, etc., or when no exchange is named)  |
 | GET | `/api/v1/crypto/hyperliquid/spot/usdc/kline` | `hyperliquid-spot-usdc-kline` | Hyperliquid spot USDC kline (use for HYPE, or when the user explicitly says "on Hyperliquid")|
 | GET | `/api/v1/stocks/kline` | `stocks-kline` | US stock kline |
-| GET | `/api/v1/stocks/non-us/kline` | `stocks-non-us-kline` | Non-US stock daily kline (`1d` only; dotted-suffix symbols like `0700.HK`; local-currency prices) |
+| GET | `/api/v1/stocks/non-us/kline` | `stocks-non-us-kline` | Non-US stock kline (`1min`–`1m`; dotted-suffix symbols like `0700.HK`; local-currency prices, minor-unit venues in sub-units) |
+| GET | `/api/v1/market/kline` | `market-kline` | Unified OHLCV by `trading_pair` (`BINANCE_SPOT_BTC_USDT`, `US_SPOT_AAPL_USD`, `HYPERLIQUID_PERP_NVDA_USDC`, `US_OPTION_…`, `CME_FUTURE_GCUSD_USD`, `FX_SPOT_EURUSD_USD`); RFC 3339 times |
+| GET | `/api/v1/market/trading-pairs` | `market-trading-pairs` | Every `trading_pair` a symbol trades as, grouped by instrument type |
 
 > For detailed parameters, response fields, and examples for a specific endpoint, read `references/<file>.md` in this skill directory.
 
@@ -43,7 +46,7 @@ US and non-US stock kline plus crypto spot kline/OHLCV (Binance USDT, Hyperliqui
 | `symbol` | string | yes | Base token (e.g. `BTC`, `ETH`, `HYPE`) for crypto — never `BTCUSDT`, the quote currency is fixed in the URL path. US stock symbol (e.g. `AAPL`, `TSLA`) for `stocks/kline`. Non-US dotted-suffix symbol (e.g. `0700.HK`, `000660.KS`) for `stocks/non-us/kline`. |
 | `start_time` | int | yes | Start time (Unix seconds). Must be > 0 |
 | `end_time` | int | yes | End time (Unix seconds). Must be > start_time |
-| `interval` | string | yes | `1min`, `2min`, `3min`, `5min`, `10min`, `15min`, `30min`, `45min`, `1h`, `2h`, `4h`, `1d`, `1w`, `1m`, `3m`, `6m` (Binance + `stocks/kline`). Hyperliquid is narrower: `1min`, `5min`, `15min`, `30min`, `1h`, `4h`, `1d`, `1w`, `1m`. `stocks/non-us/kline` accepts only `1d`. |
+| `interval` | string | yes | `1min`, `2min`, `3min`, `5min`, `10min`, `15min`, `30min`, `45min`, `1h`, `2h`, `4h`, `1d`, `1w`, `1m`, `3m`, `6m` (Binance + `stocks/kline`). Hyperliquid and `stocks/non-us/kline` are narrower: `1min`, `5min`, `15min`, `30min`, `1h`, `4h`, `1d`, `1w`, `1m`. |
 | `limit` | int | no | Max data points. Default 500, max 10000. |
 
 
@@ -126,8 +129,8 @@ candles = body["data"]  # data array
 for c in candles:
     print(f"Close: {c['price_close']}")
 
-# Non-US stock daily kline — dotted symbol, 1d only, latest-first,
-# prices in quote_currency (HKD, JPY, GBP, …)
+# Non-US stock kline — dotted symbol, 1min–1m intervals, latest-first,
+# prices in quote_currency (HKD, JPY, GBp/pence for .L, …)
 resp = requests.get(f"{base}/api/v1/stocks/non-us/kline",
     params={"symbol": "0700.HK", "start_time": 1748563200, "end_time": 1748908800,
             "interval": "1d", "limit": 10},
@@ -139,7 +142,7 @@ print(f"{latest['time_period_end']}: close={latest['price_close']} {latest['quot
       f"vol={latest['volume_traded']:.0f}")
 
 # Convert a local-currency close to USD (single bar).
-# Non-US kline prices are in quote_currency (HKD, JPY, GBP, …), NOT USD. Pull the
+# Non-US kline prices are in quote_currency (HKD, JPY, GBp for .L, …), NOT USD. Pull the
 # matching <CCY>USD daily series from /api/v1/macro/forex/historical and use the FX
 # `close` for the SAME calendar date as the stock bar. If that date has no FX bar
 # (FX holiday/weekend), fall back to the next available FX close.

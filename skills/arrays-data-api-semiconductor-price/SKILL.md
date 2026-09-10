@@ -1,6 +1,6 @@
 ---
 name: arrays-data-api-semiconductor-price
-description: Guides the agent to call Arrays REST APIs for semiconductor price data (DRAM spot & contract price, NAND Flash spot & contract price, Memory Card price, DXI index). Use when the user asks about DRAM prices, DDR3/DDR4/DDR5 memory pricing, NAND Flash prices (MLC/SLC), MicroSD card prices, contract/long-term memory pricing, the TrendForce DRAMeXchange (DXI) index, or semiconductor component pricing trends.
+description: Guides the agent to call Arrays REST APIs for semiconductor price data (DRAM spot & contract price, NAND Flash spot & contract price, Memory Card price, DXI index). Use when the user asks about DRAM prices, DDR3/DDR4/DDR5 memory pricing, NAND Flash prices (MLC/SLC), MicroSD card prices, contract/long-term memory pricing, the DXI memory index, or semiconductor component pricing trends.
 ---
 
 # Arrays Data API — Semiconductor Price
@@ -31,7 +31,7 @@ mix them or substitute one for the other.
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY`.
 
 ## Endpoints
@@ -45,7 +45,7 @@ mix them or substitute one for the other.
 | GET | `nand-flash-spot-price` | `nand-flash-spot-price` | Weekly | NAND Flash spot price (MLC/SLC, 9 items) |
 | GET | `nand-flash-contract-price` | `nand-flash-contract-price` | Monthly | NAND Flash contract price (MLC/SLC, 9 items) |
 | GET | `memory-card-price` | `memory-card-price` | Weekly | Memory Card price (MicroSD, 6 items) |
-| GET | `dxi-index` | `dxi-index` | Daily | TrendForce DRAMeXchange (DXI) memory index (no `item`) |
+| GET | `dxi-index` | `dxi-index` | Daily | DXI memory index (no `item`) |
 
 > For detailed parameters, response fields, valid `item` values, and examples for
 > a specific endpoint, read `references/<file>.md` in this skill directory. The five
@@ -60,8 +60,10 @@ mix them or substitute one for the other.
   applies the local timezone.
 - **Response wrapper is flat**: read `body["data"]` (a list of rows). Always
   check `body["success"]` first.
-- **Do not assume row ordering** — sort by the `date` field yourself before
-  taking "first" / "last" / "latest".
+- **Data ordering**: rows come back **ascending** by `date` (oldest first), so
+  `data[-1]` is the latest row — the *opposite* of the macro historical
+  endpoints, which are newest-first. Sorting by `date` yourself is still the
+  safest way to take "first" / "last" / "latest".
 - **`item` is case-sensitive** and must exactly match a valid value — no
   normalization. **Spot and contract use different `item` dictionaries**; see each
   reference file for its list. The live spec enum is authoritative for all five price

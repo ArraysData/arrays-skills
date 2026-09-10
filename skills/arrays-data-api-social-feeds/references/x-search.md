@@ -2,11 +2,12 @@
 
 `GET /api/v1/social-feeds/x/search`
 
-Elasticsearch full-text search (BM25 over `full_text` with multilingual analyzers) over the tracked-handle registry index — **not** a live X/Twitter search. For a handle that isn't in the registry yet, call `by-handle` first to ingest it.
+Elasticsearch full-text search (BM25 over `full_text` with multilingual analyzers) over the tracked-handle registry index — **not** a live X/Twitter search. It reads only already-ingested posts and never fetches on-demand. For a handle that isn't tracked yet, call `POST /api/v1/social-feeds/x/handles` first to start tracking it — the discovery endpoint, which is rate-capped and **billed as a premium discovery unit** (see [x-handles.md](x-handles.md)); until then its posts won't appear here.
 
-**Sort order depends on `q`:**
-- `q` present → results are BM25-ranked by relevance.
-- `q` omitted → results are reverse-chronological (`published_at` DESC) within the time window.
+**Sort order.** By default it depends on `q`: with `q` present results are BM25-ranked by relevance; with `q` omitted they're reverse-chronological (`published_at` DESC) within the time window. Pass `sort` to force an ordering regardless of `q`:
+- `relevance` — BM25 (default when `q` is present)
+- `latest` — reverse-chronological (`published_at` DESC); use to get newest-first even with a query
+- `hottest` — by `view_count` DESC
 
 **Anti-scrape rule:** when both `q` and `handle` are empty, `since` is capped to the last 30 days (and defaults to 30d if omitted). Passing either `q` or `handle` lifts that cap.
 
@@ -22,6 +23,7 @@ All filters (`q`, `handle`, `since`, `until`, `content_type`, `has_media`) are o
 | `has_media` | boolean | no | Only return posts with media when `true` |
 | `limit` | integer | no | Max results (default 50, max 200) |
 | `offset` | integer | no | Pagination offset (default 0) |
+| sort | string | no | Result ordering: relevance (default when q is present), latest (default when q is omitted), or hottest (by view_count DESC) |
 
 #### Response fields
 
@@ -48,8 +50,8 @@ Each item in the `data` array follows the same per-post shape as `by-handle`:
 | `bookmark_count` | int64 | Bookmarks. Omitted when unknown; genuine `0` is included |
 | `conversation_id` | string | X conversation thread the post belongs to |
 | `in_reply_to_user_id` | string | If a reply, the user ID being replied to |
-| `referenced_tweets` | array | One entry per referenced tweet. Each item: `{id, type, author_external_id?}` where `type` is `replied_to` / `retweeted` / `quoted`, and `author_external_id` is the referenced author's X numeric user ID when known (empty on legacy rows pre-backfill) |
-| `source` | object | **Nested source tweet** for `retweet` / `quote` / `reply` posts — a tweet object with `twitter_handle` / `display_name` / `full_text` / counters / `media`. Omitted when `content_type` is `original` |
+| `referenced_tweets` | array | One entry per referenced tweet. Each item: `{id, type, author_external_id?, text?, published_at?, author_handle?, author_display_name?}` where `type` is `replied_to` / `retweeted` / `quoted`; `author_external_id` is the referenced author's X numeric user ID when known (empty on legacy rows pre-backfill); `text`, `published_at` (RFC 3339) and the author fields are present when the referenced post has been ingested |
+| `source` | object | **Nested source tweet** for `retweet` / `quote` / `reply` posts — a tweet object with `twitter_handle` / `display_name` / `full_text` / counters / `media` (each media item: `type`, `url`, `media_key`, `width`, `height`). Omitted when `content_type` is `original` |
 | `mentions` | string[] | Handles mentioned (no `@`) |
 | `entity_mentions.people` | array | Linked person entities |
 | `entity_mentions.tickers` | array | Linked ticker entities |

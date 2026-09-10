@@ -10,8 +10,12 @@ description: Guides the agent to call Arrays REST APIs for stock metrics — fin
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
+
+## Important notes
+
+- **Data ordering**: `financial-metrics`, `market-metrics` and `ratings` are **newest-first** (descending by `observed_at` / `publish_time`). **Exception**: `darkpool` is **oldest-first** (ascending by `timestamp`), so its `data[0]` is the earliest hour in the range. Match by the time field rather than relying on `data[0]`.
 
 ## Path prefix and endpoints
 

@@ -10,7 +10,7 @@ Contract specifications, OHLCV/VWAP kline data, historical Greeks, and full chai
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
 
 ## Important notes
@@ -21,6 +21,7 @@ Contract specifications, OHLCV/VWAP kline data, historical Greeks, and full chai
   2. Call `/api/v1/options/kline` with the specific `options_ticker` to get OHLCV/VWAP data.
 - **Pagination**: `contracts` uses cursor-based pagination. Check `pagination.has_more`; if `true`, pass the `pagination.cursor` value as `cursor` in the next request.
 - **Timestamps use Eastern Time**: Options endpoints use US Eastern Time. Always use `zoneinfo.ZoneInfo("America/New_York")` for timestamp computation, not UTC.
+- **Data ordering differs per endpoint** — do not assume one convention: `kline` is **newest-first** (descending, every `interval`), `greeks` is **oldest-first** (ascending by `date`), and `contracts` sorts by `sort_by` (default `expiration_date`) ascending, with `options_ticker` as the tie-breaker — so within one expiration you get all calls by ascending strike, then all puts by ascending strike (strike is NOT a sort key unless you pass `sort_by=strike_price`). Match by the time field rather than relying on `data[0]`.
 ```python
 from datetime import datetime
 from zoneinfo import ZoneInfo

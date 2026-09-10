@@ -95,4 +95,4 @@ else:
 
 ---
 
-*Contract verified live against `https://data-tools.prd.space.id` on 2026-06-22: discovery (245 endpoints), data calls with params, `/v1` auto-strip, `VALIDATION_ERROR` on bad path, `NOT_FOUND` on unknown path, and required-param forwarding all behave as documented.*
+*Contract verified live against `https://data-tools.prd.arrays.org` on 2026-06-22: discovery (245 endpoints), data calls with params, `/v1` auto-strip, `VALIDATION_ERROR` on bad path, `NOT_FOUND` on unknown path, and required-param forwarding all behave as documented.*

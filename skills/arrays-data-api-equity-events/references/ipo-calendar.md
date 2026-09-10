@@ -13,6 +13,8 @@ Forward-looking IPO schedule from an upstream market-data vendor, with company d
 | `from` | string | No | Start date in YYYY-MM-DD format (e.g., 2025-04-24) |
 | `to` | string | No | End date in YYYY-MM-DD format (e.g., 2025-07-24) |
 
+> **Sort order:** ⚠️ **no ordering guarantee** — rows are passed through in the upstream vendor's order (arrays-core applies no `ORDER BY`). Unlike the other event endpoints (which are newest-first), sort `data` by `date` yourself before taking "first" / "next" / "latest".
+
 **Response fields** (each object in `data[]`)
 
 | Field | Type | Description |

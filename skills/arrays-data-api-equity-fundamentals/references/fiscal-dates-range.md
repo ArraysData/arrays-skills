@@ -8,6 +8,8 @@
 | `start_time` | int64 | yes | Start time (Unix seconds), matches by `calendar_end` (NOT `public_date`) |
 | `end_time` | int64 | yes | End time (Unix seconds), matches by `calendar_end` (NOT `public_date`) |
 
+> **Sort order:** `data` is sorted **ascending** by `calendar_end` (oldest fiscal period first) — the opposite of most stock time-series endpoints, which return newest-first.
+
 **Response fields** (each item in `data` array):
 
 | Field | Type | Description |

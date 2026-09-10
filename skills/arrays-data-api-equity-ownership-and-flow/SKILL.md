@@ -1,16 +1,16 @@
 ---
 name: arrays-data-api-equity-ownership-and-flow
-description: Guides the agent to call Arrays REST APIs for equity ownership and flow (institutional holdings, insider transactions, congress trades). Use when the user needs data about who owns a stock or recent insider/congress trading activity.
+description: Guides the agent to call Arrays REST APIs for equity ownership and flow (institutional holdings, insider transactions, congress trades, short interest). Use when the user needs data about who owns a stock, recent insider/congress trading activity, or short interest / short positioning (shares short, days-to-cover, short interest % of float or outstanding).
 ---
 
 
 # Arrays Data API — Equity Ownership and Flow
 
-**Domain**: `equity_ownership_and_flow`. Institutional holdings, insider transactions, and congress trades.
+**Domain**: `equity_ownership_and_flow`. Institutional holdings, insider transactions, congress trades, and short interest.
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
 
 ## Response format
@@ -38,6 +38,7 @@ Access data in Python: `body["data"]`
 | GET | `institution-holder` | `institution-holder` | Institution Holder |
 | GET | `congress/recent-trades` | `congress-recent-trades` | Congress/Senate Trade |
 | GET | `insider/transactions` | `insider-transactions` | Insider Trade |
+| GET | `short-interest` | `short-interest` | Short Interest |
 
 > For detailed parameters, response fields, and examples for a specific endpoint, read `references/<file>.md` in this skill directory.
 

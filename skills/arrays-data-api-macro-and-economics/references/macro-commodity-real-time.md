@@ -10,15 +10,19 @@
 
 **Response** — `data` is an array:
 ```json
-{ "success": true, "request_id": "...", "data": [ { "symbol": "GCUSD", "date": "2025-01-15", "price": 2650.00 } ] }
+{ "success": true, "request_id": "...", "data": [ { "symbol": "GCUSD", "date": "2026-01-15T14:26:49Z", "price": 2650.00 } ] }
 ```
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `symbol` | string | Symbol identifier |
-| `date` | string | Date (YYYY-MM-DD) |
+| `date` | string | Quote time, RFC3339 UTC (e.g. `2026-01-15T14:26:49Z`) |
 | `price` | float | Current price (close price) |
 
-> **Note:** When no data is available, the API returns default values: `{"symbol": "", "date": "", "price": 0}`.
+> **Check `date` before treating `price` as current** — it is the quote's own timestamp, not the time of
+> your request.
+
+> **Symbol:** exact and case-sensitive — `gcusd` and `GOLD` both return 400 (gold is `GCUSD`). Discover
+> valid values with `GET /api/v1/macro/commodity/symbols`.
 
 ---

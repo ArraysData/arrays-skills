@@ -2,6 +2,8 @@
 
 `GET /api/v1/crypto/open-interest`
 
+> **Sort order:** `data` is sorted **descending** by `timestamp` (newest first / reverse chronological).
+
 ```json
 {
   "success": true,

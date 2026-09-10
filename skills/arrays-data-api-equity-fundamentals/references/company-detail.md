@@ -31,3 +31,4 @@ At least one of `symbol` or `name` should be provided.
 | `website` | string | Company website URL |
 | `country` | string | Country/region |
 | `ceo` | string | CEO name |
+| `keywords` | string[] | Search keywords (ticker, brand names, key people) |

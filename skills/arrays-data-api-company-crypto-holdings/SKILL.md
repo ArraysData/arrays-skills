@@ -10,7 +10,7 @@ description: Guides the agent to call Arrays REST APIs for company crypto holdin
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
 
 ## Path prefix and endpoints
@@ -32,7 +32,7 @@ description: Guides the agent to call Arrays REST APIs for company crypto holdin
 ## Example
 
 ```js
-const base = process.env.ARRAYS_API_BASE_URL || 'https://data-tools.prd.space.id';
+const base = process.env.ARRAYS_API_BASE_URL || 'https://data-tools.prd.arrays.org';
 const apiKey = process.env.ARRAYS_API_KEY;
 const res = await fetch(`${base}/api/v1/crypto/holdings?symbol=BTC`, {
   headers: { 'X-API-Key': apiKey },

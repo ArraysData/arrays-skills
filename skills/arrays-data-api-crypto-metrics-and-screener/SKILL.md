@@ -10,8 +10,12 @@ Market cap, supply, on-chain analytics (MVRV, NUPL, SOPR, etc.), fear & greed, c
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
+
+## Important notes
+
+- **Data ordering**: the on-chain `metrics/*` series and `market-metrics` are **newest-first** (descending by time). **Oldest-first (ascending) exceptions — `data[0]` is the EARLIEST point, not the latest**: `fear-greed-index` (by `timestamp`), `market-cap` and `supply` (by date). Also: `unlock-events` comes from the upstream vendor with **no ordering guarantee** (sort client-side), and `screener/metrics/timerange` accepts an explicit `order_by`. Match by the time field rather than relying on `data[0]`.
 
 ## Endpoints
 
