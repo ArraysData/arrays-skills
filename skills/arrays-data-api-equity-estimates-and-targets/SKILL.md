@@ -1,16 +1,16 @@
 ---
 name: arrays-data-api-equity-estimates-and-targets
-description: Calls Arrays REST APIs for equity estimates and price targets — analyst price target news/consensus/summary, FactSet consensus estimates (EPS, SALES, EBITDA, etc.), and company earnings guidance. Use when the user asks about analyst price targets, Wall Street earnings estimates, revenue forecasts, or company guidance. NOT for stock letter-grade quality ratings — use stock-technical-metrics for those.
+description: Calls Arrays REST APIs for equity estimates and price targets — analyst price target news/consensus/summary, analyst consensus estimates (EPS, SALES, EBITDA, etc.), and company earnings guidance. Use when the user asks about analyst price targets, Wall Street earnings estimates, revenue forecasts, or company guidance. NOT for stock letter-grade quality ratings — use stock-technical-metrics for those.
 ---
 
 
 # Arrays Data API — Equity Estimates and Targets
 
-**Domain**: `equity_estimates_and_targets`. Price target news, price target consensus, price target summary, and FactSet estimates & guidance.
+**Domain**: `equity_estimates_and_targets`. Price target news, price target consensus, price target summary, and consensus estimates & guidance.
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
 
 ## Endpoints

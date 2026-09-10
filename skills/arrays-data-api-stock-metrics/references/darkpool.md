@@ -16,6 +16,8 @@ Retrieve darkpool trading data for specified stock symbols within a time range. 
 | `start_time` | int64 | yes | Start time (Unix timestamp in seconds) |
 | `end_time` | int64 | yes | End time (Unix timestamp in seconds) |
 
+> **Sort order:** `data` is sorted **ascending** by `timestamp` (oldest first). ⚠️ This is the *opposite* of most stock time-series endpoints (klines, dividends, short-interest, …), which return newest-first — `data[0]` here is the *earliest* hour in the range, not the latest.
+
 **Response fields** (in `data` array — each element is a `DarkpoolOHLCData`):
 
 | Field | Type | Description |

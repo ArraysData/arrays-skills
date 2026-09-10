@@ -19,14 +19,17 @@
 | `end_time` | integer | no | End time for observed_at filter (Unix timestamp in seconds) |
 | `fiscal_year` | integer | no | Fiscal year filter (e.g., 2024) |
 | `fiscal_quarter` | string | no | Fiscal quarter filter (only valid when period_type=quarterly): `Q1`, `Q2`, `Q3`, `Q4` |
-| `limit` | integer | no | Result limit (default: 10, max: 1000) |
+| `limit` | integer | no | Page size (default: 10, max: 1000) |
+| `offset` | integer | no | Rows to skip before the page (default: 0) |
 
-**Response fields when `type=estimate`** (each item in `data` array is a `FactsetEstimateRow`)
+**Response envelope:** `{ "success": true, "request_id": "...", "data": [ ... ], "pagination": { "limit", "offset" } }`
+
+**Response fields when `type=estimate`** (each item in `data` array)
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `symbol` | string | Stock symbol |
-| `fsym_id` | string | FactSet symbol ID |
+| `fsym_id` | string | Vendor symbol ID |
 | `metric` | string | Metric name (e.g., EPS, SALES, EBITDA) |
 | `periodicity` | string | Period type: `annual`, `quarterly`, or `semi-annual` |
 | `fiscal_period` | string | Fiscal period: `Q1`, `Q2`, `Q3`, `Q4` |
@@ -43,12 +46,12 @@
 | `up` | *int32 | Number of estimates increased |
 | `down` | *int32 | Number of estimates decreased |
 
-**Response fields when `type=guidance`** (each item in `data` array is a `FactsetGuidanceRow`)
+**Response fields when `type=guidance`** (each item in `data` array)
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `symbol` | string | Stock symbol |
-| `fsym_id` | string | FactSet symbol ID |
+| `fsym_id` | string | Vendor symbol ID |
 | `metric` | string | Metric name (e.g., EPS, SALES, EBITDA) |
 | `periodicity` | string | Period type: `annual`, `quarterly`, or `semi-annual` |
 | `fiscal_period` | string | Fiscal period: `Q1`, `Q2`, `Q3`, `Q4` |

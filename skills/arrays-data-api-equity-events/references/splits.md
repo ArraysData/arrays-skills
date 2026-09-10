@@ -21,5 +21,6 @@ PIT (Point-in-Time) stock split data for a specific symbol within a time range.
 | `date` | string | Split date (YYYY-MM-DD) |
 | `numerator` | number | Split numerator (e.g., 2.0 for a 2-for-1 split) |
 | `denominator` | number | Split denominator (e.g., 1.0 for a 2-for-1 split) |
+| `observed_at` | int64 | Observation timestamp (Unix seconds), for backtest PIT use |
 
 ---

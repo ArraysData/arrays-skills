@@ -19,6 +19,8 @@ Get historical K-line data for options contracts. Provides OHLCV metrics, VWAP, 
 
 ## Response
 
+> **Sort order:** `data` is sorted **descending** by time (newest first / reverse chronological) for every `interval`, matching the other kline endpoints. Note this is the opposite of `/options/greeks`, which returns ascending by `date`.
+
 ```json
 {
   "success": true,

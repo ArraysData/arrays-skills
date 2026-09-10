@@ -1,6 +1,6 @@
 ---
 name: arrays-data-api-stock-metrics
-description: Guides the agent to call Arrays REST APIs for stock metrics — financial metrics (revenue TTM, net income TTM, EPS TTM, ROE, ROA, ROIC, margins, debt ratios, current/quick ratio), market/technical metrics (market cap, moving averages, EMA, SMA, RSI, MACD, Bollinger, VWAP, beta, volatility, PE ratio, PB ratio, PS ratio, dividend yield, enterprise value, EV/EBITDA, price changes), darkpool OHLC, and PIT ratings. Use when the user asks about stock market cap, financial ratios, computed market indicators, darkpool data, or point-in-time stock quality ratings (letter-grade scores like A+, B, C based on DCF, ROE, P/E, etc.).
+description: Guides the agent to call Arrays REST APIs for stock metrics — financial metrics (revenue TTM, net income TTM, EPS TTM, ROE, ROA, ROIC, margins, debt ratios, current/quick ratio), market/technical metrics (market cap, moving averages, EMA, SMA, RSI, MACD, Bollinger, VWAP, beta, volatility, PE ratio (incl. trailing P/E and forward P/E), PB ratio, PS ratio, dividend yield, enterprise value, EV/EBITDA, price changes), darkpool OHLC, and PIT ratings. Use when the user asks about stock market cap, financial ratios, computed market indicators (including trailing or forward P/E), darkpool data, or point-in-time stock quality ratings (letter-grade scores like A+, B, C based on DCF, ROE, P/E, etc.).
 ---
 
 
@@ -10,8 +10,12 @@ description: Guides the agent to call Arrays REST APIs for stock metrics — fin
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
+
+## Important notes
+
+- **Data ordering**: `financial-metrics`, `market-metrics` and `ratings` are **newest-first** (descending by `observed_at` / `publish_time`). **Exception**: `darkpool` is **oldest-first** (ascending by `timestamp`), so its `data[0]` is the earliest hour in the range. Match by the time field rather than relying on `data[0]`.
 
 ## Path prefix and endpoints
 
@@ -40,6 +44,53 @@ Access in Python: `body["data"]`
 | GET | `ratings` | `ratings` | PIT analyst ratings |
 
 > For detailed parameters, response fields, and examples for a specific endpoint, read `references/<file>.md` in this skill directory.
+
+## Computed P/E ratios (trailing & forward)
+
+P/E is a `price / EPS` division.
+
+- **Trailing P/E**: The `PE_RATIO` indicator on `market-metrics` already gives this directly — prefer it. Only compute manually when you need a custom as-of-date price or a non-standard TTM window: current price / `EPS_TTM` (`financial-metrics`, latest `values[0]`).
+- **Forward P/E** = current price / **forward EPS estimate**.
+  - Forward EPS comes from `estimates-guidance` (read the `arrays-data-api-equity-estimates-and-targets` skill for more details): `metrics=EPS`, `type=estimate`, `period_type=annual, semi-annual or quarterly`.
+  - **Preferred forward window: the next 4 quarters' EPS estimates** (the current/in-progress quarter plus the following three, i.e. Q, Q+1, Q+2, Q+3) summed into a next-twelve-months (NTM) forward EPS. Query `period_type=quarterly`, keep the upcoming quarters, and sum the latest **median** consensus estimate for each (prefer `median` over `mean` — it's more robust to outlier analyst estimates). Other valid windows include current fiscal year, next fiscal year, etc. Match what the question needs.
+
+For both, "current price" is the latest daily close from `stocks/kline` (in the `arrays-data-api-spot-market-price-and-volume` skill).
+
+```python
+# Forward P/E for AAPL — price / next-4-quarters (NTM) consensus EPS (preferred default)
+# 1) latest daily close
+resp = requests.get(f"{base}/api/v1/stocks/kline",
+    params={"symbol": "AAPL", "interval": "1d",
+            "start_time": to_ts(2026, 5, 25), "end_time": to_ts(2026, 6, 2)},
+    headers={"X-API-Key": key})
+price = resp.json()["data"][0]["price_close"]  # reverse-chronological; data[0] is latest
+
+# 2) quarterly EPS estimates -> sum the next 4 quarters (current + Q+1, Q+2, Q+3)
+resp = requests.get(f"{base}/api/v1/stocks/estimates-guidance",
+    params={"symbol": "AAPL", "metrics": "EPS", "type": "estimate",
+            "period_type": "quarterly", "limit": 100},
+    headers={"X-API-Key": key})
+rows = [r for r in resp.json()["data"] if (r.get("estimate_count") or 0) > 3]
+today = "2026-06-02"
+upcoming = [r for r in rows if r["fiscal_end_date"] >= today]  # not-yet-reported quarters
+next_quarters = sorted({r["fiscal_end_date"] for r in upcoming})[:4]  # nearest 4 quarters
+# within each quarter, take the latest estimate by estimate_date, then sum the
+# median consensus -> NTM EPS (median is more robust to outlier analyst estimates)
+fwd_eps = sum(
+    max((r for r in upcoming if r["fiscal_end_date"] == q),
+        key=lambda e: e["estimate_date"])["median"]
+    for q in next_quarters)
+
+forward_pe = price / fwd_eps  # if only annual estimates exist, fall back to the FY consensus
+
+# Trailing P/E (manual) — prefer the PE_RATIO market-metric unless you need a custom price/window
+resp = requests.get(f"{base}/api/v1/stocks/financial-metrics",
+    params={"metric": "EPS_TTM", "symbol": "AAPL",
+            "start_time": to_ts(2025, 6, 1), "end_time": to_ts(2026, 6, 2)},
+    headers={"X-API-Key": key})
+eps_ttm = resp.json()["data"][0]["values"][0]["value"]
+trailing_pe = price / eps_ttm
+```
 
 ## Python examples
 

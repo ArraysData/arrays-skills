@@ -4,6 +4,8 @@
 
 Retrieve time series data for various market indicators, including technical and fundamental metrics.
 
+Covers US-listed securities across NYSE, NASDAQ, NYSE American, NYSE Arca, and Cboe BZX (XNYS/XNAS/XASE/ARCX/BATS) — all indicators for stocks, price/technical indicators only for ETFs (fundamental indicators like `MARKET_CAP`, `PE_RATIO` don't apply to ETFs). OTC is excluded.
+
 **Indicator formats** — indicators requiring a period are formatted as `{INDICATOR}_{PERIOD}`:
 - **PRICE_CHANGE**: `PRICE_CHANGE_1d`, `PRICE_CHANGE_1w`, `PRICE_CHANGE_1M`, `PRICE_CHANGE_3M`, `PRICE_CHANGE_6M`, `PRICE_CHANGE_ytd`, `PRICE_CHANGE_1y`, `PRICE_CHANGE_3y`, `PRICE_CHANGE_5y`
 - **MA**: `MA_5`, `MA_10`, `MA_20`, `MA_60`, `MA_120`, `MA_200`
@@ -40,7 +42,7 @@ Each element in `values` (`MarketMetricValue`):
 | Field | Type | Description |
 |-------|------|-------------|
 | `observed_at` | int64 | Observation timestamp (Unix seconds) |
-| `date` | string | Formatted date (YYYY-MM-DD HH:mm:ss, UTC+0) |
+| `date` | string | UTC RFC3339 with `Z` (e.g. `2026-06-05T20:00:00Z`) |
 | `value` | *float64 | Metric value (null if not available) |
 | `metric_component` | string | Metric component label (e.g., UPPER); omitted when empty |
 

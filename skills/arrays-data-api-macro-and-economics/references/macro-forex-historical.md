@@ -11,8 +11,14 @@ These three endpoints share the same parameter and response structure (OHLCV dai
 | `symbol` | string | yes | Symbol identifier. Index: e.g. `^GSPC`, `^DJI`, `^IXIC`. Forex: e.g. `EURUSD`, `GBPJPY`. Commodity: e.g. `GCUSD`, `HEUSX`, `SILUSD` |
 | `start_time` | integer | yes | Start time (Unix timestamp in seconds) |
 | `end_time` | integer | yes | End time (Unix timestamp in seconds) |
+| `sort_order` | string | no | `desc` (default) = newest first; `asc` = oldest first (chronological). |
 
-**Response** — `data` is an array of OHLCV bars:
+> **Sort order:** default is newest-first (`data[0]` = latest bar). Pass `sort_order=asc` for chronological order (oldest-first, so `data[-1]` = latest) — what SMA/ATR/rolling-window code expects.
+
+> **Symbol:** exact and case-sensitive — `eurusd` returns 400. Discover valid values with
+> `GET /api/v1/macro/forex/symbols`.
+
+**Response** — `data` is an array of OHLCV bars, newest-first by default:
 ```json
 { "success": true, "request_id": "...", "data": [ { "symbol": "EURUSD", "date": "2025-08-18", "open": 1.166, "close": 1.166, ... } ] }
 ```
@@ -35,13 +41,12 @@ These three endpoints share the same parameter and response structure (OHLCV dai
 import requests, os
 base = os.environ["ARRAYS_API_BASE_URL"]
 key = os.environ["ARRAYS_API_KEY"]
-# Get EURUSD historical data
+# EURUSD history, chronological order (sort_order=asc -> bars[-1] is the latest bar)
 resp = requests.get(f"{base}/api/v1/macro/forex/historical",
-    params={"symbol": "EURUSD", "start_time": 1723939200, "end_time": 1723939200},
+    params={"symbol": "EURUSD", "start_time": 1723939200, "end_time": 1726531200, "sort_order": "asc"},
     headers={"X-API-Key": key})
 body = resp.json()
-bars = body["data"]  # array of OHLCV bars
-for bar in bars:
+for bar in body["data"]:
     print(f"{bar['date']}: close={bar['close']}")
 ```
 

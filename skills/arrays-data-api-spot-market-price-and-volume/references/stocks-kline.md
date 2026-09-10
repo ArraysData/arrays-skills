@@ -23,6 +23,8 @@
 
 Response envelope: `{ "request_id": "...", "data": [ ... ] }` — `data` is always an array of StockKlineData items.
 
+> **Sort order:** `data` is sorted **descending** by time (newest first / reverse chronological), matching the other kline endpoints. Pass the result through your own sort if you need oldest-first for rolling-window/technical-analysis code.
+
 **Each item in `data` (StockKlineData):**
 
 | Field | JSON key | Type | Description |

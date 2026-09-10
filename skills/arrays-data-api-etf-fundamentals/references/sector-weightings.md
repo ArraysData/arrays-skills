@@ -17,5 +17,6 @@ Each object in the `data` array:
 | `symbol` | string | The ETF ticker symbol |
 | `sector` | string | Sector name (e.g., "Technology", "Financial Services") |
 | `weight_percentage` | float64 | Percentage weight as a number (e.g., 34.62) |
+| `updated_at` | string | Snapshot as-of / refresh time, RFC3339 with `Z` (e.g. `2026-06-24T03:06:07Z`) |
 
 ---

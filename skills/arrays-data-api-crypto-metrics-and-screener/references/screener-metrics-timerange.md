@@ -2,7 +2,7 @@
 
 `GET /api/v1/crypto/screener/metrics/timerange`
 
-Same as snapshot variant, but replace `snapshot` with `start_time`, `end_time`, and optional `limit`.
+Same as snapshot variant, but replace `snapshot` with `start_time`, `end_time`, and optional `limit`. Underlying price & volume are from Binance spot markets, so symbols are Binance USDT pairs (e.g. `BTCUSDT`).
 
 **Response fields** — V2 wrapper (`data` is an array of date-grouped objects):
 
@@ -17,7 +17,7 @@ Each item in `items`:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `symbol` | string | Token symbol |
+| `symbol` | string | Binance USDT trading pair (e.g. `BTCUSDT`) |
 | `snapshot_time` | int64 | Snapshot time in Unix seconds |
 | `metric` | string | Metric type identifier |
 | `value` | float64 | Metric value |

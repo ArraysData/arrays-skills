@@ -9,6 +9,7 @@
 | `symbol` | string | yes | Token symbol (**only `BTC` supported currently**) |
 | `start_time` | int64 | yes | Unix seconds |
 | `end_time` | int64 | yes | Unix seconds |
+| `time_type` | string | no | `DATE` (default) or `OBSERVED_AT` |
 | `limit` | int32 | no | Max results (1-1000). If not set, returns all matched data |
 
 **Response fields** — V2 wrapper (`data` is an array). Each metric has its own fields:

@@ -10,7 +10,7 @@ description: Guides the agent to call Arrays REST APIs for macro and economics d
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
 
 ## Response envelope
@@ -22,6 +22,16 @@ All endpoints return a unified JSON envelope:
 - `data` is **always an array** (even for single-object results).
 - Access data in Python: `body["data"]`
 - Always check `body["success"]` before accessing data.
+
+On failure the shape is different — `data` is `null` and the reason is in `error`:
+```json
+{ "success": false, "data": null,
+  "error": { "code": "INVALID_PARAMETER",
+             "message": "forex symbol not found: eurusd",
+             "docs_url": "https://data-tools.prd.arrays.org/docs/output/v1_macro_forex_real-time_get.json" },
+  "request_id": "..." }
+```
+An unknown symbol is 400 / `INVALID_PARAMETER`, not 404. Read `error.message` before retrying.
 
 ## Endpoints
 
@@ -36,12 +46,14 @@ All endpoints return a unified JSON envelope:
 | GET | `index/real-time` | `macro-index-real-time` | Index real-time data |
 | GET | `forex/real-time` | `macro-forex-real-time` | Forex real-time data |
 | GET | `commodity/real-time` | `macro-commodity-real-time` | Commodity real-time data |
+| GET | `index/symbols` | `macro-index-symbol-list` | Available index symbols (the index roster) |
 | GET | `forex/symbols` | `macro-forex-symbol-list` | Available forex symbols |
 | GET | `commodity/symbols` | `macro-commodity-symbol-list` | Available commodity symbols |
 | GET | `treasury-rates` | `rates` | US treasury yield rates |
 
 > For detailed parameters, response fields, and examples for a specific endpoint, read `references/<file>.md` in this skill directory.
 
+Discover valid symbols with the matching `*/symbols` endpoint first.
 
 ## Example
 

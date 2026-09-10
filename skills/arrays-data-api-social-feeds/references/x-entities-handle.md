@@ -26,5 +26,18 @@ Each item in the `data` array (typically one item):
 | `profile_banner_url` | string | URL of the account's banner image |
 | `account_created_at` | string | ISO 8601 (UTC) — account creation time |
 | `earliest_backfilled_at` | string | ISO 8601 (UTC) — start of contiguous post coverage. Older posts may exist (e.g. pulled in via URL lookups, or as replies/retweets to other tweets) but aren't guaranteed contiguous before this time. |
+| `last_synced_at` | string | ISO 8601 (UTC) — when Arrays last synced this handle's posts (the upper bound of post coverage). Stays current while the handle is actively tracked; for a handle no longer tracked it marks when syncing stopped; omitted if the handle has never been synced. This is a *sync* timestamp, not a guarantee that every post before this time is present. |
+| `tags` | object | **Optional** — present when the account has been classified |
+
+`tags` sub-fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tags.account_kind` | string | `personal` or `institution` |
+| `tags.occupation` | string[] | Roles (e.g. `investing_kol`, `investor`, `builder`). Populated only when `account_kind == "personal"` |
+| `tags.institution_type` | string | E.g. `company`, `government`, `media`. Populated only when `account_kind == "institution"` |
+| `tags.topics` | string[] | Topic tags (e.g. `crypto`, `ai`, `policy`, `entertainment`) |
+| `tags.language` | string[] | ISO language codes (e.g. `en`, `ko`) |
+| `tags.behavior` | string[] | Posting-behavior tags (e.g. `original`, `curator`, `aggregator`) |
 
 The response envelope also includes `request_id` (no `pagination` block).

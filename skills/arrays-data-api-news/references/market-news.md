@@ -11,7 +11,7 @@ Retrieve market news articles within a specified time range, optionally filtered
 | `start_time` | integer | yes | Start time (Unix timestamp in seconds) |
 | `end_time` | integer | yes | End time (Unix timestamp in seconds) |
 | `symbol` | string | no | Stock symbol filter (e.g., AAPL, TSLA) |
-| `topic` | string | no | Topic filter. Values: `BLOCKCHAIN`, `EARNINGS`, `ECONOMY_FISCAL`, `ECONOMY_MACRO`, `ECONOMY_MONETARY`, `ENERGY_TRANSPORTATION`, `FINANCE`, `FINANCIAL_MARKETS`, `IPO`, `LIFE_SCIENCES`, `MANUFACTURING`, `MERGERS_AND_ACQUISITIONS`, `REAL_ESTATE`, `RETAIL_WHOLESALE`, `TECHNOLOGY` |
+| `topic` | string | no | Topic filter, lowercase: `blockchain`, `earnings`, `economy_fiscal`, `economy_macro`, `economy_monetary`, `energy_and_transportation`, `finance`, `financial_markets`, `ipo`, `life_sciences`, `manufacturing`, `mergers_and_acquisitions`, `real_estate_and_construction`, `retail_and_wholesale`, `technology`. Deprecated aliases `energy_transportation`, `real_estate`, `retail_wholesale` are still accepted and resolve to the values above; `topics[].topic` in responses always carries the canonical form |
 | `source` | string | no | Media source filter. Values: `Reuters`, `AP News`, `BBC`, `The New York Times`, `The Washington Post`, `The Guardian`, `Bloomberg`, `The Wall Street Journal`, `Financial Times`, `CNBC`, `Fortune`, `Forbes`, `TechCrunch`, `MIT Technology Review`, `The Verge`, `WIRED`, `South China Morning Post`, `Nikkei Asia`, `Business Wire`, `PR Newswire` |
 | `sort_by_type` | string | no | Sort by type: `PUBLISHED_TIME`, `OVERALL_SENTIMENT_SCORE`, or `RELEVANCE_SCORE` (default: `PUBLISHED_TIME`) |
 | `sort_by` | string | no | Sort order: `ASC` or `DESC` (default: `DESC`) |

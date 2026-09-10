@@ -10,7 +10,7 @@ Company screener, basic-info screener (by country, exchange, industry, sector), 
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
 
 ## Endpoints
@@ -39,7 +39,6 @@ Each `metric_type` lives in exactly one endpoint. Use this table to route the re
 | TTM profitability | financial-metrics | `ROA_TTM`, `ROE_TTM`, `ROIC_TTM` |
 | MRQ margins | financial-metrics | `GROSS_MARGIN_MRQ`, `OPERATING_MARGIN_MRQ`, `NET_MARGIN_MRQ`, `FCF_MARGIN_MRQ` |
 | MRQ balance-sheet ratios | financial-metrics | `CURRENT_RATIO_MRQ`, `QUICK_RATIO_MRQ`, `DEBT_TO_ASSETS_MRQ`, `DEBT_TO_EQUITY_MRQ`, `NET_WORKING_CAPITAL_MRQ` |
-| R&D intensity | financial-metrics | `RD_TO_SALES_TTM` |
 | Revenue growth | financial-metrics | `REVENUE_GROWTH_QOQ`, `REVENUE_GROWTH_YOY_QUARTERLY`, `REVENUE_GROWTH_YOY_TTM`, `REVENUE_GROWTH_YOY_ANNUAL` |
 | EPS growth | financial-metrics | `EPS_GROWTH_QOQ`, `EPS_GROWTH_YOY_QUARTERLY`, `EPS_GROWTH_YOY_TTM`, `EPS_GROWTH_YOY_ANNUAL` |
 | FCF growth | financial-metrics | `FCF_GROWTH_QOQ`, `FCF_GROWTH_YOY_QUARTERLY`, `FCF_GROWTH_YOY_TTM`, `FCF_GROWTH_YOY_ANNUAL` |
@@ -69,7 +68,7 @@ Rule of thumb: if it comes from financial statements or price-vs-fundamentals ra
 ## Example
 
 ```js
-const base = process.env.ARRAYS_API_BASE_URL || 'https://data-tools.prd.space.id';
+const base = process.env.ARRAYS_API_BASE_URL || 'https://data-tools.prd.arrays.org';
 const apiKey = process.env.ARRAYS_API_KEY;
 if (!apiKey) throw new Error('ARRAYS_API_KEY is not set');
 

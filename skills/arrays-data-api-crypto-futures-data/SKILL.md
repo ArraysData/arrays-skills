@@ -1,16 +1,16 @@
 ---
 name: arrays-data-api-crypto-futures-data
-description: Calls Arrays REST APIs for crypto derivatives data — perpetual K-line / OHLCV / candlestick (Binance USDT perp and Hyperliquid USDC perp, including HIP-3 tokenized equities like AAPL, TSLA), funding rates, open interest, long-short ratios, and taker buy/sell volume. Use when the user asks about perpetual futures price or volume, perp candles, funding costs, leveraged positions, derivatives market sentiment, futures data for any cryptocurrency, or any HIP-3 listing on Hyperliquid.
+description: Calls Arrays REST APIs for crypto derivatives data — perpetual K-line / OHLCV / candlestick (Binance USDT perp and Hyperliquid USDC perp, including HIP-3 tokenized equities like AAPL, TSLA), funding rates (Binance 8-hourly and Hyperliquid hourly, including HIP-3 listings), open interest, long-short ratios, and taker buy/sell volume. Use when the user asks about perpetual futures price or volume, perp candles, funding costs, leveraged positions, derivatives market sentiment, futures data for any cryptocurrency, or any HIP-3 listing on Hyperliquid.
 ---
 
 
 # Arrays Data API — Crypto Futures Data
 
-Perpetual K-line (Binance USDT perp + Hyperliquid USDC perp incl. HIP-3), funding rate, open interest, long-short ratio, and taker buy/sell volume for crypto futures.
+Perpetual K-line (Binance USDT perp + Hyperliquid USDC perp incl. HIP-3), funding rate (Binance and Hyperliquid), open interest, long-short ratio, and taker buy/sell volume for crypto futures.
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
 
 ## Endpoints
@@ -21,7 +21,8 @@ Perpetual K-line (Binance USDT perp + Hyperliquid USDC perp incl. HIP-3), fundin
 |--------|------|------|-------------|
 | GET | `binance/perp/usdt/kline` | `binance-perp-usdt-kline` | Binance perpetual USDT futures candles (price + volume) |
 | GET | `hyperliquid/perp/usdc/kline` | `hyperliquid-perp-usdc-kline` | Hyperliquid perpetual USDC candles — standard perps and **HIP-3** listings (AAPL, TSLA, …) |
-| GET | `funding-rate` | `funding-rate` | Funding Rate |
+| GET | `funding-rate` | `funding-rate` | Binance funding rate (8-hourly) |
+| GET | `hyperliquid/perp/funding-rate` | `hyperliquid-perp-funding-rate` | Hyperliquid funding rate (hourly) — standard perps and **HIP-3** listings (NVDA, AAPL, …) |
 | GET | `open-interest` | `open-interest` | Open Interest |
 | GET | `long-short-ratio` | `long-short-ratio` | Long Short Ratio |
 | GET | `taker-buy-sell-volume` | `taker-buy-sell-volume` | Taker Buy Sell Volume |
@@ -31,6 +32,7 @@ Perpetual K-line (Binance USDT perp + Hyperliquid USDC perp incl. HIP-3), fundin
 ## Important notes
 
 - **Data ordering**: Results are returned in **reverse chronological order** (latest first). When querying for data "on" a specific date, the query `start_time=target_day, end_time=next_day` returns two data points: `data[0]` is the next day's value (NOT the target) and `data[-1]` is the target day's value. **Always match by timestamp or use `data[-1]`** to get the target date's data point.
+- **Funding rate routing**: `funding-rate` is Binance only (`exchange=binance`, `BTCUSDT`-style symbol, settles every 8 hours). For Hyperliquid — or any HIP-3 listing such as `NVDA` / `AAPL`, which Binance does not have — use `hyperliquid/perp/funding-rate` (base symbol like `BTC`, settles every hour).
 - **Quote currency scope (perp kline)**: Binance perp kline only via **USDT** pairs; Hyperliquid perp kline only via **USDC** pairs (incl. HIP-3 listings). Coin-margined and other quote pairs are not exposed.
 - **Funding rate settlement**: Binance funding rates settle every 8 hours at **00:00, 08:00, 16:00 UTC**. Only query for exact settlement times. When querying a specific settlement, set `start_time` to the exact settlement time and **`end_time` to `start_time + 3600`** (1 hour after). NEVER use `end_time = start_time + 1` — a window of just 1 second will return NO results. Always add at least 3600 seconds.
 - **Timestamp computation**: Always use Python `datetime` + `calendar` + `timedelta` to compute Unix timestamps. Do NOT calculate timestamps by mental arithmetic — this is error-prone. Always use `timedelta(days=1)` to compute "next day" — never `day + 1` (which crashes on month boundaries like Nov 30 → "Nov 31").
@@ -57,6 +59,8 @@ The four derivatives metrics endpoints (`funding-rate`, `open-interest`, `long-s
 | `limit` | int32 | no | Max results (1-1000, default 30) |
 | `interval` | string | no | Time interval (only `1d` supported, default `1d`). Not applicable to `funding-rate`. |
 | `exchange` | string | no | Exchange name (only `binance` supported, default `binance`) |
+
+`hyperliquid/perp/funding-rate` takes a base-only `symbol` (`BTC`, `NVDA`), no `exchange` / `interval`, `limit` up to 1000 and a `sort_order`; see its reference file.
 
 The two **perp kline** endpoints take a different parameter set (base-only `symbol` like `BTC` not `BTCUSDT`, no `exchange`, wider `interval` set, `limit` up to 10000). See their reference files for the exact schema.
 

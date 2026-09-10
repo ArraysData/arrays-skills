@@ -1,17 +1,21 @@
 ---
 name: arrays-data-api-equity-fundamentals
-description: Calls Arrays REST APIs for equity fundamentals — company profiles, executive compensation (salary, bonus, stock awards), income/balance/cashflow statements, shares float, outstanding shares, fiscal dates, and KPI. Use when the user asks about company details, executive pay, quarterly/annual financial statements, or earnings filings. Do NOT use for financial metrics (revenue TTM, net income TTM, EPS TTM, ROE, ROA, ROIC, margins, debt ratios, current/quick ratio) or market-level technical indicators (moving averages, EMA, RSI, MACD, Bollinger, VWAP, beta, volatility, PE ratio, PB ratio, PS ratio, dividend yield, enterprise value, EV/EBITDA, price changes) — those MUST use arrays-data-api-stock-metrics.
+description: Calls Arrays REST APIs for equity fundamentals — company profiles (US and non-US listings such as `0700.HK`, `9988.HK`, `000660.KS`), executive compensation (salary, bonus, stock awards), income/balance/cashflow statements, shares float, outstanding shares, fiscal dates, and SEC 10-K / 10-Q filing metadata with EDGAR links. Use when the user asks about company details (US or non-US), executive pay, quarterly/annual financial statements, earnings filings, or where to find a company's 10-K or 10-Q. Do NOT use for financial metrics (revenue TTM, net income TTM, EPS TTM, ROE, ROA, ROIC, margins, debt ratios, current/quick ratio) or market-level technical indicators (moving averages, EMA, RSI, MACD, Bollinger, VWAP, beta, volatility, PE ratio, PB ratio, PS ratio, dividend yield, enterprise value, EV/EBITDA, price changes) — those MUST use arrays-data-api-stock-metrics.
 ---
 
 
 # Arrays Data API — Equity Fundamentals
 
-Company profiles, financial statements, shares float, outstanding shares, fiscal dates, and KPI.
+Company profiles, financial statements, shares float, outstanding shares, fiscal dates, and SEC 10-K / 10-Q filing metadata.
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
+
+## Important notes
+
+- **Data ordering**: the statement endpoints (`company/income-statements`, `company/balance-sheets`, `company/cashflow-statements`), `outstanding-shares` and `sec-filings` are **newest-first** (descending by period/report date). **Exception**: `fiscal-dates/range` is **oldest-first** (ascending by `calendar_end`). Ordering is moot for `fiscal-dates`, which requires an exact `fiscal_year` + `fiscal_quarter` and returns a single row. Filter by the date/period fields rather than relying on `data[0]`.
 
 ## Endpoints
 
@@ -19,16 +23,17 @@ Company profiles, financial statements, shares float, outstanding shares, fiscal
 
 | Method | Path | File | Description |
 |--------|------|------|-------------|
-| GET | `company/detail` | `company-detail` | Company detail |
+| GET | `company/detail` | `company-detail` | Company detail (US tickers, e.g. `AAPL`) |
+| GET | `non-us/company/detail` | `company-detail-non-us` | Company detail for non-US tickers (dotted-suffix form, e.g. `0700.HK`, `000660.KS`) — separate response schema; **curated symbol subset** (selected non-US listings only) |
 | GET | `company/income-statements` | `company-income-statements` | Financial statements |
 | GET | `company/balance-sheets` | `company-balance-sheets` | Financial statements |
 | GET | `company/cashflow-statements` | `company-cashflow-statements` | Financial statements |
 | GET | `company/executives` | `company-executives` | Executives info |
-| GET | `company/kpi` | `company-kpi` | KPI |
 | GET | `shares-float` | `shares-float` | Shares float |
 | GET | `outstanding-shares` | `outstanding-shares` | Company-level outstanding shares with per-share-class breakdown |
 | GET | `fiscal-dates` | `fiscal-dates` | Fiscal dates |
 | GET | `fiscal-dates/range` | `fiscal-dates-range` | Fiscal dates by range |
+| GET | `sec-filings` | `sec-filings` | 10-K / 10-Q filing metadata (accession number, filing and report dates, EDGAR `file_url`) |
 
 > For detailed parameters, response fields, and examples for a specific endpoint, read `references/<file>.md` in this skill directory.
 
@@ -88,23 +93,21 @@ statements = body["data"]  # array of income statement objects
 for s in statements:
     print(f"Revenue: {s['revenue']}, Net Income: {s['net_income']}")
 
-# KPI values
-resp = requests.get(f"{base}/api/v1/stocks/company/kpi",
-    params={"symbol": "HD", "fiscal_year": 2025, "fiscal_quarter": "Q3"},
-    headers={"X-API-Key": key})
-body = resp.json()
-kpis = body["data"]  # array of KPI objects
-for k in kpis:
-    for m in k["metrics"]:
-        print(f"{m['name']}: {m['value']}")
-
-# Company detail
+# Company detail (US)
 resp = requests.get(f"{base}/api/v1/stocks/company/detail",
     params={"symbol": "AAPL"},
     headers={"X-API-Key": key})
 body = resp.json()
 company = body["data"]  # array
 print(f"Name: {company[0]['name']}, Sector: {company[0]['sector']}")
+
+# Company detail (non-US) — note the different path and response field names
+resp = requests.get(f"{base}/api/v1/stocks/non-us/company/detail",
+    params={"symbol": "0700.HK"},
+    headers={"X-API-Key": key})
+body = resp.json()
+profile = body["data"][0]  # uses `company_name` / `currency`, not `name`
+print(f"{profile['company_name']} on {profile['exchange_full_name']} ({profile['currency']})")
 
 # Executives info
 resp = requests.get(f"{base}/api/v1/stocks/company/executives",

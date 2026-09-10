@@ -2,7 +2,7 @@
 
 `GET /api/v1/stocks/screener/financial-metrics`
 
-Includes companies with market cap > $5B at the snapshot time (current market caps may have since drifted below this threshold).
+Covers US-listed stocks on NYSE, NASDAQ, and NYSE American (XNYS/XNAS/XASE), with no size/liquidity floor — rankings include microcaps and illiquid names. Add a `MARKET_CAP` range filter (size) or a `DOLLAR_VOLUME` screen via `technical-metrics` (liquidity); each call filters only the queried metric.
 
 ## Parameters
 
@@ -20,7 +20,6 @@ Includes companies with market cap > $5B at the snapshot time (current market ca
 - **TTM base metrics**: `REVENUE_TTM`, `NET_INCOME_TTM`, `EPS_TTM`
 - **TTM profitability**: `ROA_TTM`, `ROE_TTM`, `ROIC_TTM`
 - **MRQ margins**: `GROSS_MARGIN_MRQ`, `OPERATING_MARGIN_MRQ`, `NET_MARGIN_MRQ`, `FCF_MARGIN_MRQ`
-- **Other**: `RD_TO_SALES_TTM`
 - **Revenue growth**: `REVENUE_GROWTH_QOQ`, `REVENUE_GROWTH_YOY_QUARTERLY`, `REVENUE_GROWTH_YOY_TTM`, `REVENUE_GROWTH_YOY_ANNUAL`
 - **EPS growth**: `EPS_GROWTH_QOQ`, `EPS_GROWTH_YOY_QUARTERLY`, `EPS_GROWTH_YOY_TTM`, `EPS_GROWTH_YOY_ANNUAL`
 - **FCF growth**: `FCF_GROWTH_QOQ`, `FCF_GROWTH_YOY_QUARTERLY`, `FCF_GROWTH_YOY_TTM`, `FCF_GROWTH_YOY_ANNUAL`

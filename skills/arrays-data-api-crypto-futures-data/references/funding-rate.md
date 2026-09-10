@@ -2,6 +2,8 @@
 
 `GET /api/v1/crypto/funding-rate`
 
+> **Sort order:** `data` is sorted **descending** by `timestamp` (newest first / reverse chronological).
+
 Binance funding rates settle every **8 hours** at 00:00, 08:00, 16:00 UTC. Query for exact settlement times only.
 
 **CRITICAL — Fallback for missing settlement times**: Some tokens only have data at certain settlement times (e.g., AAVE only has 00:00 UTC). If querying a specific settlement time returns **empty `data`**, you MUST immediately retry with a full-day range (`start_time=day_start, end_time=next_day_start`) and report any available funding rate for that day. Never output "No data" or "API_ERROR" without trying the full-day fallback first. Filter the results to match the target date's timestamp.

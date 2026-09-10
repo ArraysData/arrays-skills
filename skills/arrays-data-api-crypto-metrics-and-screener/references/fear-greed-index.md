@@ -9,6 +9,8 @@
 | `start_time` | int64 | yes | Start time (Unix seconds) |
 | `end_time` | int64 | yes | End time (Unix seconds) |
 
+> **Sort order:** `data` is sorted **ascending** by `timestamp` (oldest first). ⚠️ This is the *opposite* of the other crypto time-series endpoints (long/short-ratio, open-interest, funding-rate), which return newest-first — do not assume one global ordering convention across the API.
+
 **Response fields** — V2 wrapper (`data` is an array of objects):
 
 | Field | Type | Description |

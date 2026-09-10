@@ -15,10 +15,9 @@ Latest equity offerings, including new shares being issued by companies and exem
 | Field | Type | Description |
 |-------|------|-------------|
 | `cik` | string | SEC CIK number |
-| `url` | string | SEC filing URL |
 | `company_name` | string | Company name |
 | `entity_name` | string | Entity name |
-| `filling_date` | string | Filing date |
+| `filing_date` | string | Filing date |
 | `date` | string | Offering date (ISO 8601) |
 | `form_type` | string | SEC form type (e.g., "D") |
 | `form_signification` | string | Form description (e.g., "Notice of Exempt Offering of Securities") |
@@ -57,8 +56,6 @@ Latest equity offerings, including new shares being issued by companies and exem
 | `sales_commissions` | integer | Sales commissions (may be null) |
 | `finders_fees` | integer | Finders fees (may be null) |
 | `gross_proceeds_used` | integer | Gross proceeds used (may be null) |
-| `created_date` | string | Record creation date |
-| `updated_date` | string | Record last-update date |
 | `acceptance_time` | string | SEC filing acceptance time |
 
 ---

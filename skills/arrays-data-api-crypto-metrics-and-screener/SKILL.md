@@ -1,17 +1,21 @@
 ---
 name: arrays-data-api-crypto-metrics-and-screener
-description: Calls Arrays REST APIs for crypto on-chain analytics and screening — market cap, circulating/total supply, fear & greed index, on-chain metrics (MVRV, NUPL, SOPR, realized price, leverage ratio, SSR, whale ratio, Puell multiple, miner-to-exchange, inflow CDD), crypto metrics screener, token lists, trading pairs, token unlock schedules (cliff and linear allocations for DeFi protocols like Hyperliquid, Arbitrum, Uniswap, etc.), and Bitcoin correlation indices. Use when the user asks about crypto market cap, token supply, crypto market sentiment, on-chain analysis, token screening, token discovery, protocol token unlock events and vesting schedules, or Bitcoin correlation with other assets.
+description: Calls Arrays REST APIs for crypto on-chain analytics and screening — token metadata profile (name, category, description, logo, contract addresses per chain, official URLs), market cap, circulating/total supply, fear & greed index, on-chain metrics (MVRV, NUPL, SOPR, realized price, leverage ratio, SSR, whale ratio, Puell multiple, miner-to-exchange, inflow CDD), crypto metrics screener, token unlock schedules (cliff and linear allocations for DeFi protocols like Hyperliquid, Arbitrum, Uniswap, etc.), and Bitcoin correlation indices. Use when the user asks about a token's metadata/profile (full name, category, description, logo, contract addresses, website/twitter/explorer links), crypto market cap, token supply, crypto market sentiment, on-chain analysis, token screening, protocol token unlock events and vesting schedules, or Bitcoin correlation with other assets.
 ---
 
 
 # Arrays Data API — Crypto Metrics and Screener
 
-Market cap, supply, on-chain analytics (MVRV, NUPL, SOPR, etc.), fear & greed, crypto screener, token lists, trading pairs, DeFi pools.
+Market cap, supply, on-chain analytics (MVRV, NUPL, SOPR, etc.), fear & greed, crypto screener.
 
 ## Base URL and auth
 
-- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.space.id`)
+- **Base**: `ARRAYS_API_BASE_URL` env var (default `https://data-tools.prd.arrays.org`)
 - **Auth**: Send `X-API-Key: <key>` header on every request. Read the key from env `ARRAYS_API_KEY` or `.env` file.
+
+## Important notes
+
+- **Data ordering**: the on-chain `metrics/*` series and `market-metrics` are **newest-first** (descending by time). **Oldest-first (ascending) exceptions — `data[0]` is the EARLIEST point, not the latest**: `fear-greed-index` (by `timestamp`), `market-cap` and `supply` (by date). Also: `unlock-events` comes from the upstream vendor with **no ordering guarantee** (sort client-side), and `screener/metrics/timerange` accepts an explicit `order_by`. Match by the time field rather than relying on `data[0]`.
 
 ## Endpoints
 
@@ -19,6 +23,7 @@ Market cap, supply, on-chain analytics (MVRV, NUPL, SOPR, etc.), fear & greed, c
 
 | Method | Path | File | Description |
 |--------|------|------|-------------|
+| GET | `detail` | `crypto-detail` | Token metadata profile by symbol (name, category, description, logo, contracts, URLs) |
 | GET | `fear-greed-index` | `fear-greed-index` | Fear & greed index |
 | GET | `unlock-events` | `unlock-events` | Unlock events |
 | GET | `market-metrics` | `market-metrics` | Retrieve a specific metric for a given token (e.g. BTC's MA_20, MARKET_CAP, PRICE_CHANGE) |
@@ -32,8 +37,6 @@ Market cap, supply, on-chain analytics (MVRV, NUPL, SOPR, etc.), fear & greed, c
 | GET | `metrics/miner-to-exchange` | `metrics-miner-to-exchange` | Retrieve miner-to-exchange flow for a given token |
 | GET | `metrics/sopr` | `metrics-sopr` | Retrieve SOPR for a given token |
 | GET | `metrics/puell-multiple` | `metrics-puell-multiple` | Retrieve Puell multiple for a given token |
-| GET | `trading-pair` | `trading-pair` | Trading pair |
-| GET | `list` | `list` | Token list by chain |
 | GET | `market-cap` | `crypto-market-cap` | Retrieve market cap history for a given token |
 | GET | `supply` | `crypto-supply` | Retrieve supply history for a given token |
 | GET | `screener/metrics` | `screener-metrics` | Screener: find/filter/screen tokens by a metric (e.g. top tokens by market cap, tokens with RSI > 70) |
@@ -54,10 +57,6 @@ Market cap, supply, on-chain analytics (MVRV, NUPL, SOPR, etc.), fear & greed, c
 { "success": false, "data": null, "error": { "code": "...", "message": "..." }, "request_id": "..." }
 ```
 
-## Pagination
-
-- `list`: Offset-based. Use `offset` + `limit`.
-
 ## Python examples
 
 ```python
@@ -70,6 +69,15 @@ headers = {"X-API-Key": key}
 
 def to_ts(year, month, day):
     return int(calendar.timegm(datetime(year, month, day, tzinfo=timezone.utc).timetuple()))
+
+# Token metadata profile (name, category, description, logo, contracts, URLs)
+resp = requests.get(f"{base}/api/v1/crypto/detail",
+    params={"symbol": "BTC"}, headers=headers)
+token = resp.json()["data"][0]
+print(token["name"], token["category"])
+for c in token["contracts"]:
+    print(f"  {c['chain']}: {c['address']}")
+print("website:", token["urls"].get("website", []))
 
 # On-chain metric: MVRV for BTC
 resp = requests.get(f"{base}/api/v1/crypto/metrics/mvrv",
